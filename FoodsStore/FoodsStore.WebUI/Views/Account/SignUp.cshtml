@@ -1,0 +1,45 @@
+﻿@model FoodsStore.Domain.Entities.User
+
+@{
+    ViewBag.Title = "SignUp";
+    Layout = "~/Views/Shared/_ProductLayout.cshtml";
+}
+
+<head>
+    <link rel="stylesheet" href="~/assets/style/style-validation.css" />
+</head>
+
+<article style="margin: auto; vertical-align:middle; max-width:720px;">
+    <h1 style="color:black">Sign up</h1>
+    @using (Html.BeginForm("SignUp", "Account", FormMethod.Post)) {
+        @Html.LabelFor(u => u.Username) @:(2 - 64 characters)<font color="red">*</font>
+        @Html.TextBoxFor(u => u.Username, new { @class = "form-control" })
+        @Html.ValidationMessageFor(u => u.Username)
+        @Html.ValidationMessage("duplicatedUsername")
+        <br />
+        @Html.LabelFor(u => u.Password) @:(6 - 64 characters)<font color="red">*</font>
+        @Html.PasswordFor(u => u.Password, new { @class = "form-control" })
+        @Html.ValidationMessageFor(u => u.Password)
+        <br />
+        @Html.Label("Confirm password") @:<font color="red">*</font>
+        @Html.Password("confirmPassword", null, new { @class = "form-control" })
+        @Html.ValidationMessage("passwordNotMatch")
+        <br />
+        @Html.LabelFor(u => u.FullName) @:(1 - 250 characters)<font color="red">*</font>
+        @Html.TextBoxFor(u => u.FullName, new { @class = "form-control" })
+        @Html.ValidationMessageFor(u => u.FullName)
+        <br />
+        @Html.LabelFor(u => u.Email)
+        @Html.TextBoxFor(u => u.Email, new { @class = "form-control" })
+        @Html.ValidationMessageFor(u => u.Email)
+        @Html.ValidationMessage("duplicatedEmail")
+        <br />
+        <input type="hidden" name="returnUrl" value="@ViewBag.returnUrl" />
+        <input type="submit" value="Submit" class="btn btn-success" />
+        <br />
+    }
+    <font color="green" style="font-size:1.5em">@ViewBag.status</font>
+    <input type="hidden" class="currentIDProduct" value="@TempData["currentIDProduct"]" />
+</article>
+<br />
+<script src="~/assets/product-js/pop-up.js"></script>

@@ -1,0 +1,133 @@
+﻿@using FoodsStore.WebUI.Models;
+
+@{
+    if (User.Identity.IsAuthenticated)
+    {
+        @Html.Action("LoadCartDetailsUser", "Cart");
+    }
+    CartDetailsModel cart = (CartDetailsModel)Session["CartDetails"];
+
+}
+<!--Style shopping cart hover-->
+<link rel="stylesheet" href="~/assets/style/style-shopping-cart-hover.css" />
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<form style="float: right;" action="/Cart/LoadCartDetails" method="POST">
+    @{
+        if (cart != null)
+        {
+            <input type="hidden" name="IDBill" id="UserbillId" value="@cart.BillID" />
+            <input type="hidden" name="returnUrl" value="" />
+            <a href="#0" id="num-prod-in-bill" onclick="setReturnUrlLoadCart(); $(this).closest('form').submit();"><i class="fas fa-shopping-cart"></i>@cart.QuantityProduct</a>
+        }
+        else
+        {
+            <input type="hidden" name="IDBill" id="UserbillId" value="0" />
+            <input type="hidden" name="returnUrl" value="" />
+            <a href="#0" id="num-prod-in-bill" onclick="setReturnUrlLoadCart(this); $(this).closest('form').submit();"><i class="fas fa-shopping-cart"></i>0</a>
+        }
+    }
+</form>
+<ul class="sp-cart" id="sp-cart-user">
+    <li>
+        <div>
+            <header id="site-header">
+                <div class="container">
+                    <h3>Your shopping cart</h3>
+                </div>
+            </header>
+            <div class="container">
+                <section id="cart">
+                    @{
+                        if (cart == null || cart.ProductsInCart == null || !cart.ProductsInCart.Any())
+                        {
+                            <h3 id="no-prod">No products!</h3>
+                        }
+                        else
+                        {
+                            foreach (ProductInCartDetailsModel x in cart.ProductsInCart)
+                            {
+                                <article class="product">
+                                    <header>
+                                        <img src="@Url.Action("GetImageProduct","Product",new { x.ProductID})" alt="">
+                                    </header>
+                                    <div class="content">
+                                        <h5>@x.ProductName</h5>
+                                        @x.ShortDescription
+                                    </div>
+                                    <footer class="content">
+                                        <span class="qt">Kind:@Html.Action("GetProductKindName", "Product", new { x.ProductID })</span>
+                                        <span class="qt">Category: @Html.Action("GetProductCategoryName", "Product", new { x.ProductID })</span>
+                                        <span class="qt">Quantity: @x.Quantity</span>
+                                        @{
+                                            if (x.StatusCode.Equals("OUTS"))
+                                            {
+                                                <span class="qt" style="background-color: red;">Out of Stock</span>
+                                            }
+                                            else if (x.StatusCode.Equals("STOP"))
+                                            {
+                                                <span class="qt" style="background-color: red;">Stop selling</span>
+                                            }
+                                        }
+                                        <h5 class="full-price">
+                                            @x.Total$
+                                        </h5>
+                                        <h5 class="price">
+                                            @x.Price$
+                                        </h5>
+                                    </footer>
+                                </article>
+                            }
+                        }
+                    }
+                </section>
+            </div>
+            <footer id="site-footer">
+                <div class="container clearfix">
+                    <div class="left">
+                        @{
+                            if (cart == null || cart.ProductsInCart == null || !cart.ProductsInCart.Any())
+                            {
+                                <h5 class="subtotal">Subtotal: <span>0</span>$</h5>
+                                <h5 class="tax">Taxes (10%): <span>0</span>$</h5>
+                                <h5>Last time change: </h5>
+                            }
+                            else
+                            {
+                                <h5 class="subtotal">Subtotal: <span>@cart.SubTotal</span>$</h5>
+                                <h5 class="tax">Taxes (10%): <span>@cart.Tax</span>$</h5>
+                                <h5>Last time change: @cart.LastTimeChange</h5>
+                            }
+                        }
+                    </div>
+                    <div class="right">
+                        @{
+                            if (cart == null || cart.ProductsInCart == null || !cart.ProductsInCart.Any())
+                            {
+                                <h3 class="total">Total: <span>0</span>$</h3>
+                            }
+                            else
+                            {
+                                <h3 class="total">Total: <span>@cart.Total</span>$</h3>
+                            }
+                        }
+                        
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </li>
+</ul>
+@{
+    if (cart != null)
+    {
+        if (cart.ProductsInCart != null && cart.ProductsInCart.Any())
+        {
+            <script>
+                $(".cd-popup").addClass("is-visible");
+                $(".cd-popup-container").children("p").replaceWith("<p class='message-display'>Hana Shop System check that you have a bill is not ordered yet!" +
+                    "Do you want to continue shopping?</p>");
+
+            </script>
+        }
+    }
+}

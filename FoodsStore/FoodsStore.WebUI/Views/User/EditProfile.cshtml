@@ -1,0 +1,203 @@
+﻿@model FoodsStore.Domain.Entities.User
+
+@{
+    Layout = "~/Views/Shared/_ProductLayout.cshtml";
+}
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>User Details Page</title>
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="~/assets/images/logo/favicon.png" type="image/x-icon">
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="~/assets/style/templatemo-style.css">
+    <link rel="stylesheet" href="~/assets/css/animate-3.7.0.css">
+    <link rel="stylesheet" href="~/assets/css/font-awesome-4.7.0.min.css">
+    <link rel="stylesheet" href="~/assets/css/bootstrap-4.1.3.min.css">
+    <link rel="stylesheet" href="~/assets/css/owl-carousel.min.css">
+    <link rel="stylesheet" href="~/assets/css/jquery.datetimepicker.min.css">
+    <link rel="stylesheet" href="~/assets/css/style.css">
+    <link rel="stylesheet" href="~/assets/style/pop-up-message-out-of-stock.css" />
+    <link rel="stylesheet" href="~/assets/style/style-avt-user.css">
+    <link rel="stylesheet" href="~/assets/style/upload-pic-food.css" type="text/css">
+    <link rel="stylesheet" href="~/assets/css/nice-select.css" type="text/css">
+
+    <!--Css for validation model start-->
+    <link rel="stylesheet" href="~/assets/style/style-validation.css" type="text/css" />
+    <!--Css for validation model end-->
+
+</head>
+<br />
+
+@using (Html.BeginForm("SaveProfile", "User", FormMethod.Post, new { @class = "container", enctype = "multipart/form-data" })) {
+    @*<input type="hidden" name="oldAvatar" value="${requestScope.UserDetails.avatar}">
+        <input type="hidden" name="userID" value="${requestScope.UserDetails.userID}">*@
+    @Html.HiddenFor(u => u.Username)
+    @Html.HiddenFor(u => u.DateCreated)
+    @Html.HiddenFor(u => u.RoleID)
+    @Html.Hidden("returnUrl", new { ViewBag.returnUrl })
+    <div class="row tm-content-row">
+        <div class="tm-block-col tm-col-avatar">
+            <div class="tm-bg-primary-dark tm-block tm-block-avatar">
+                <h4 class="tm-block-title">Avatar</h4>
+                <div class="uploadWrapper">
+                    <div id="imageUploadForm" class="imageUploadForm">
+                        <span class="helpText" id="helpText">Upload an image</span>
+                        <img style="height: 350px; width: 320px;" src="@Url.Action("GetImageUser", "User", new { username = Model.Username })">
+                        <input type="file" id="fileUpdate"
+                               class="uploadButton" name="avatar"
+                               accept="image/*">
+                        <div id="uploadedImg" class="uploadedImg">
+                            <span class="unveil"></span>
+                        </div>
+                    </div>
+                </div>
+                <div style="height: 80px;"></div>
+            </div>
+        </div>
+        <div class="tm-block-col tm-col-account-settings">
+            <div class="tm-bg-primary-dark tm-block tm-block-settings">
+                <h4 class="tm-block-title">Account Information</h4>
+                <div class="tm-signup-form row">
+                    <div class="form-group col-lg-6">
+                        <label for="name">Full name</label>
+                        @*<input id="name" name="name" type="text"
+                            class="form-control validate" value="@Model.Username" />*@
+                        @Html.TextBoxFor(u => u.FullName,
+                        new { id = "name", @class = "form-control validate", value = Model.FullName })
+                        @Html.ValidationMessageFor(u => u.FullName)
+                    </div>
+                    <div class="form-group col-lg-6">
+                        <label for="email">Account Email</label>
+                        @*<input id="email" name="email" type="email" disabled
+                            class="form-control validate" value="${requestScope.UserDetails.email}" />*@
+                        @Html.TextBoxFor(u => u.Email, new { id = "email", type = "email",
+                        @class = "form-control validate", value = Model.Email })
+                        @Html.ValidationMessageFor(u => u.Email)
+                        @Html.ValidationMessage("duplicatedEmail")
+                    </div>
+                    <div class="form-group col-lg-6">
+                        <label for="Date Create">Date Create</label>
+                        @*<input id="phone"
+                            name="dateCreate"
+                            type="text"
+                            disabled
+                            class="form-control validate" value="${requestScope.UserDetails.dateCreate}" />*@
+                        @Html.TextBoxFor(u => u.DateCreated, new { id = "phone", disabled = "",
+                       @class = "form-control validate", value = Model.DateCreated })
+                    </div>
+                    <div class="form-group col-lg-6">
+                        <div class="form-group mb-3">
+                            <label for="description">Description</label>
+                            @*<textarea name="description" class="form-control validate" rows="3" required>${requestScope.UserDetails.description}
+                                </textarea>*@
+                            @Html.TextAreaFor(u => u.Description, new { @class = "form-control validate", rows = "3", value = Model.Description })
+                            @Html.ValidationMessageFor(u => u.Description)
+                        </div>
+                    </div>
+                    <div class="form-group col-lg-6">
+                        <label for="Role">Role</label>
+                        @*<c:if test="${sessionScope.USERDTO.roleID == 'US'}">
+                                <input id="phone" type="text" disabled class="form-control validate"
+                                       value="Customer" />
+                            </c:if>*@
+                        @*<c:if test="${sessionScope.USERDTO.roleID == 'AD' && requestScope.UserDetails.roleID == 'AD' }">
+                                <input id="phone" type="text" disabled class="form-control validate"
+                                       value="Administrator" />
+                            </c:if>*@
+                        @if (!HttpContext.Current.User.IsInRole("Admin") ||
+                            (HttpContext.Current.User.Identity.Name.Equals(Model.Username)
+                            && HttpContext.Current.User.IsInRole("Admin"))) {
+                            @*If role != admin or (role = "admin" && đây là profile của chính admin đang login*@
+                            <input id="phone" type="text" disabled class="form-control validate"
+                                   value="@Html.Action("GetRoleName", "User", new { username = Model.Username })" />
+
+                        } else {
+                            <!-- Đây là phần của AdminController-->
+                        }
+                        @*<input type="hidden" name="oldRoleID" value="${requestScope.UserDetails.roleID}" />
+                            <c:if test="${sessionScope.USERDTO.roleID == 'AD' && requestScope.UserDetails.roleID != 'AD'}">
+                                <select class="custom-select tm-select-accounts" id="category" name="roleID" required>
+                                    <c:forEach items="${requestScope.ListRole}" var="x">
+                                        <option value="${x.roleID}"
+                                                <c:if test="${requestScope.UserDetails.roleID == x.roleID}">
+                                                                selected
+                                                            </c:if>*
+                                            ${x.roleDetail}
+                                        </option>
+                                    </c:forEach>
+                                </select>
+                            </c:if>*@
+                    </div>
+                    <div class="form-group col-lg-6">
+                        <label class="tm-hide-sm">&nbsp;</label>
+                        <button type="submit" class="btn btn-primary btn-block text-uppercase">
+                            Update Profile
+                        </button>
+                        <br />
+                        <a class="btn btn-secondary" style="color:white" href="@ViewBag.returnUrl">Back</a>
+                    </div>
+                    
+                </div>
+                @*<c:if test="${requestScope.UserDetails.roleID == 'US'}">
+                        <div class="col-12">
+                            <a onclick="$('#go-history-shopping').submit();" class="btn btn-primary btn-block text-uppercase">
+                                View History Shopping
+                            </a>
+                        </div>
+                    </c:if>*@
+            </div>
+        </div>
+    </div>
+}
+
+
+<div class="message-popup" role="alert">
+    <div class="message-popup-container">
+        @{
+            if (ViewBag.StatusUpdate != null) {
+                <p class="message-display">@ViewBag.StatusUpdate</p>
+            }
+        }
+
+        <a href="#0" class="message-buttons" style="color: #000; font-size: 25px;">OK</a>
+        <a href="#0" class="message-popup-close img-replace">Close</a>
+    </div> <!-- message-popup-container -->
+</div> <!-- message-popup -->
+
+@{
+    if (ViewBag.StatusUpdate != null) {
+        <script>
+            $(".message-popup").addClass("is-visible");
+        </script>
+    }
+}
+
+
+<form style="display: none;" id="go-history-shopping" action="SearchBillByUserController" method="POST">
+    <input type="hidden" name="userID" value="${requestScope.UserDetails.userID}">
+</form>
+
+@*<script>
+        <c:if test="${not empty requestScope.MESSAGEUPDATE}">
+            $(".message-popup").addClass("is-visible");
+                </c:if>
+    </script>*@
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="~/assets/product-js/avt-user.js"></script>
+
+<script src="~/assets/product-js/pop-up-confirm.js"></script>
+<script src="~/assets/product-js/pop-up-message-out-of-stock.js"></script>
+<script src="~/assets/product-js/jquery-3.3.1.min.js"></script>
+<!-- https://jquery.com/download/ -->
+<script src="~/assets/product-js/moment.min.js"></script>
+<!-- https://momentjs.com/ -->
+<script src="~/assets/product-js/Chart.min.js"></script>
+<!-- http://www.chartjs.org/docs/latest/ -->
+<script src="~/assets/product-js/bootstrap.min.js"></script>
+<!-- https://getbootstrap.com/ -->
+<script src="~/assets/product-js/tooplate-scripts.js"></script>
+<script src="~/assets/js/vendor/jquery.datetimepicker.full.min.js"></script>
+<script src="~/assets/js/vendor/jquery.nice-select.min.js"></script>

@@ -1,0 +1,26 @@
+﻿@model FoodsStore.WebUI.Models.ProductListViewModel
+
+@{
+    Layout = "~/Views/Shared/_ProductLayout.cshtml";
+    ViewBag.Title = "Hana Shop - Index";
+
+    int totalItemInLastestProductList = 3; //Tổng số product trong phần 'Our new products'
+}
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <script src="https://use.fontawesome.com/releases/v5.11.2/js/all.js" data-auto-replace-svg="nest"></script>
+</head>
+
+<!--this is search component-->
+@Html.Partial("~/Views/Product/_searchComponentPartialView.cshtml")
+<!--this is container of index-->
+@Html.Partial("~/Views/Product/_containerIndexPartialView.cshtml")
+<!-- The most purchased products Area End -->
+<!-- List food user's preference Start -->
+<!-- List food user's preference End -->
+<!-- Out new product Area Starts -->
+@Html.Action("GetLatestProducts", "Product", new { quantity = totalItemInLastestProductList })
+<!-- Out new product Area End -->
+
+<!-- Load Facebook SDK for JavaScript -->

@@ -1,0 +1,207 @@
+﻿@model FoodsStore.WebUI.Models.GraphDashBoardModel
+@{
+    ViewBag.Title = "Dashboard Hana Shop";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewBag.SelectedView = "Dashboard";
+}
+    <link rel="stylesheet" href="~/assets/style/templatemo-style.css">
+<div class="" id="home">
+    @Html.Partial("~/Views/Admin/_NavbarPartialView.cshtml")
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <h4 class="mt-5 mb-5"> <b>Welcome back, Admin @Html.Action("GetFullNameUser", "Account", new { username = HttpContext.Current.User.Identity.Name }) !!</b></h4>
+            </div>
+        </div>
+        <div class="row tm-content-row">
+            <div class="col-12 tm-block-col">
+                <div class="tm-bg-primary-dark tm-block tm-block-h-auto">
+                    <h4 class="tm-block-title">View Information 7 days from</h4>
+                    <div class="input-group mb-3">
+
+                        <input type="date" class="dateStr" onchange="getGraphDashboard();" name="dateStr" value="@Request["date"]">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- row -->
+        <div class="row tm-content-row">
+            <div class="col-sm-12 col-md-12 col-lg-6 col-xl-6 tm-block-col">
+                <div class="tm-bg-primary-dark tm-block" style="background-color: azure;">
+                    <h4 class="tm-block-title" style="color: burlywood;">Number of Ordered bills</h4>
+                    <canvas id="lineChart"></canvas>
+                </div>
+            </div>
+            <div class="col-sm-12 col-md-12 col-lg-6 col-xl-6 tm-block-col">
+                <div class="tm-bg-primary-dark tm-block" style="background-color: azure;">
+                    <h4 class="tm-block-title" style="color: burlywood;">Revenue </h4>
+                    <canvas id="lineChart2"></canvas>
+                </div>
+            </div>
+            <div class="col-sm-12 col-md-12 col-lg-6 col-xl-6 tm-block-col">
+                <div class="tm-bg-primary-dark tm-block tm-block-taller" style="background-color: azure;">
+                    <h4 class="tm-block-title" style="color: burlywood;">Number product In Storage of each Kind</h4>
+                    <div id="pieChartContainer">
+                        <canvas id="pieChart" class="chartjs-render-monitor" width="200" height="200"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-12 col-md-12 col-lg-6 col-xl-6 tm-block-col">
+                <div class="tm-bg-primary-dark tm-block" style="background-color: azure;">
+                    <h4 class="tm-block-title" style="color: burlywood;">Number product In Storage of each Category</h4>
+                    <canvas id="barChart"></canvas>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@{
+    foreach (int t in Model.ListNumberBillEachDay)
+    {
+        <input type="hidden" class="numBill" value="@t" />
+    }
+    foreach (string d in Model.ListDate)
+    {
+        <input type="hidden" class="dateTime" value="@d" />
+    }
+    foreach (double r in Model.ListRevenueEachDay)
+    {
+        <input type="hidden" class="revenue" value="@r" />
+    }
+    @*
+        foreach (string cate in Model.ListQuantityProductIsSoldHasCategory.Keys)
+        {
+            <input type="hidden" class="cate" id="@cate" value="@Model.ListQuantityProductIsSoldHasCategory[cate]" />
+        }
+    *@
+
+    foreach (string cate in Model.ListQuantityProductInStorageHasCategory.Keys)
+    {
+        <input type="hidden" class="cate" id="@cate" value="@Model.ListQuantityProductInStorageHasCategory[cate]" />
+    }
+
+    foreach (string kind in Model.ListQuantityProductInStorage.Keys)
+    {
+        <input type="hidden" class="kind" id="@kind" value="@Model.ListQuantityProductInStorage[kind]" />
+    }
+
+
+}
+<script>
+    var timeOrder = [];
+    var dateTime = [];
+    var revenue = [];
+    var listCate = [];
+    var numProductOfCate = [];
+    var listKind = [];
+    var numProductOfKind = [];
+    var d = new Date();
+    var currentDate = (d.getDate() - 7) + "/" + (d.getMonth() + 1) + "/" + d.getFullYear();
+    // Chart.defaults.global.defaultFontColor = 'white';
+    let ctxLine,
+        ctxBar,
+        ctxPie,
+        optionsLine,
+        optionsBar,
+        optionsPie,
+        configLine,
+        configBar,
+        configPie,
+        lineChart,
+        lineChart2;
+    barChart, pieChart;
+    // DOM is ready
+    $(function () {
+
+        $(".kind").each(function (index) {
+            listKind.push($(".kind").eq(index).attr("id"));
+            numProductOfKind.push(parseInt($(".kind").eq(index).val()));
+        });
+        $(".cate").each(function (index) {
+            listCate.push($(".cate").eq(index).attr("id"));
+            numProductOfCate.push(parseInt($(".cate").eq(index).val()));
+        });
+        $(".numBill").each(function (index) {
+            timeOrder.push(parseInt($(".numBill").eq(index).val()));
+            dateTime.push($(".dateTime").eq(index).val());
+            revenue.push($(".revenue").eq(index).val());
+            //console.log(dateTime[index] + "-" + timeOrder[index]);
+        });
+        drawGraph(timeOrder, dateTime, revenue, listCate, numProductOfCate, listKind, numProductOfKind);
+
+
+    });
+
+    function getGraphDashboard() {
+        var dateStr = $('.dateStr').val();
+        $.ajax({
+            url: "/Admin/DrawDashboardJson?dateStr=" + dateStr,
+            method: "get",
+            success: function (result) {
+                dateTime = [];
+                timeOrder = [];
+                revenue = [];
+                $.each(result.ListDate, function (i, item) {
+                    dateTime.push(item);
+                });
+                $.each(result.ListNumberBillEachDay, function (i, item) {
+                    timeOrder.push(item);
+                });
+                $.each(result.ListRevenueEachDay, function (i, item) {
+                    revenue.push(item);
+                });
+                drawLineChart(dateTime, timeOrder); // Line Chart
+                drawLineChart2(dateTime, revenue);
+            }
+        });
+    }
+
+    window.onloadeddata = getDataAuto();
+
+    function getDataAuto() {       
+        setInterval(function () {          
+            var dateStr = $('.dateStr').val();
+            if (currentDate.localeCompare(dateStr) == 0) {
+                $.ajax({
+                    url: "/Admin/DrawDashboardAutoJson",
+                    method: "get",
+                    success: function (result) {
+                        if (timeOrder[6] != result.NumberBillToday) {
+                            timeOrder[6] = result.NumberBillToday;
+                            revenue[6] = result.RevenueToday;
+                            drawLineChart(dateTime, timeOrder); // Line Chart
+                            drawLineChart2(dateTime, revenue);
+                        }
+                    }
+                });
+            }
+        }, 30000);
+    }
+    function drawGraph(timeOrder, dateTime, revenue, listCate, numProductOfCate, listKind, numProductOfKind) {
+        var colors = ['#f6e58d', '#be2edd',
+            '#22a6b3', '#eb4d4b', '#e58e26', '#fff200',
+            '#7efff5', '#32ff7e', '#18dcff', '#38ada9',
+            '#9980FA', '#82ccdd', '#f8c291', '#f9ca24'];
+        drawLineChart(dateTime, timeOrder); // Line Chart
+        drawLineChart2(dateTime, revenue);
+        drawBarChart(listCate, numProductOfCate, colors); // Bar Chart
+        drawPieChart(numProductOfKind, listKind, colors); // Pie Chart
+
+        $(window).resize(function () {
+            updateLineChart();
+            updateBarChart();
+        });
+
+    }
+
+</script>
+
+<script>
+    $("#datepicker").bind({
+        keydown: function (e) {
+            return false;
+        }
+    });
+</script>

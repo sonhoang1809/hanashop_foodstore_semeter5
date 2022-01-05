@@ -1,0 +1,337 @@
+﻿@model FoodsStore.WebUI.Models.ProductListViewModel
+
+<link rel="stylesheet" href="~/assets/style/style-paging.css" />
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<section class="food-area section-padding">
+    <div class="container" id="scroll-here">
+        <div class="row" >
+            <div class="col-md-5">
+                <div class="section-top">
+                    <h3><span class="style-change">We serve</span> <br>delicious food</h3>
+                </div>
+            </div>
+        </div>
+        <div class="row" id="product-area">
+            @foreach (var product in Model.Products)
+            {
+                string linkOfProductDetails = Url.Action("Details", "Product", new { productId = product.ProductID });
+                if (User.Identity.IsAuthenticated) {
+                    if (HttpContext.Current.User.IsInRole("Admin")) {
+                        linkOfProductDetails = Url.Action("EditProduct", "Admin", new { productId = product.ProductID, returnUrl = Request.Url.PathAndQuery });
+                    }
+                }
+                <div class="col-md-4 col-sm-6">
+                    <div class="single-food">
+                        <div class="food-img">
+                            <a href="@linkOfProductDetails"><img src="@Url.Action("GetImageProduct", "Product", new { product.ProductID })" class="img-fluid" alt=""></a>
+                        </div>
+                        <div class="food-content">
+                            <div class="d-flex justify-content-between">
+                                <h5>@product.ProductName</h5>
+                                <span class="style-change">@product.Price.ToString("c")</span>
+                            </div>
+                            <p class="pt-3">@product.Description</p>
+                            <div style="display: inline-block; font-size: 17px;">
+                                @if (User.Identity.IsAuthenticated)
+                                {
+                                    if (HttpContext.Current.User.IsInRole("Admin"))
+                                    {
+                                        @Html.ActionLink("Edit Product", "EditProduct", "Admin", new { productId = product.ProductID, returnUrl = Request.Url.PathAndQuery }, new { @class = "genric-btn primary", style = "float:left;" })
+                                    }
+                                    else
+                                    {
+                                        <input type="submit" onclick="displayPopup(@product.ProductID);" id="add-to-cart" class="genric-btn danger" name="action" value="Add to cart" />
+                                        @Html.ActionLink("View Details", "Details", "Product", new { productId = product.ProductID, returnUrl = Request.Url.PathAndQuery }, new { @class = "genric-btn primary", style = "float:left;" })
+                                    }
+                                }
+                                else
+                                {
+                                    <input type="submit" onclick="displayPopup(@product.ProductID);" id="add-to-cart" class="genric-btn danger" name="action" value="Add to cart" />
+                                    @Html.ActionLink("View Details", "Details", "Product", new { productId = product.ProductID, returnUrl = Request.Url.PathAndQuery }, new { @class = "genric-btn primary", style = "float:left;" })
+                                }
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<div class="wrapper">
+    <nav>
+        <ul class="pager" id="paging-here">
+            @{
+                FoodsStore.WebUI.Models.SearchInfo searchInfor = Model.SearchInfo;
+                if (searchInfor != null)
+                {
+                    @Html.PageLinksJson(Model.PagingInfo, "active", "pager__item", "pager__link");
+                }
+                else
+                {
+                    @Html.PageLinksJson(Model.PagingInfo, "active", "pager__item", "pager__link");
+                }
+            }
+        </ul>
+    </nav>
+</div>
+@{
+    if (User.Identity.IsAuthenticated)
+    {
+        if (HttpContext.Current.User.IsInRole("Admin"))
+        {
+    <script>
+                function searchProduct(page) {
+                    $(".message-popup").addClass("is-visible");
+                    var insideMes =
+                        '<div class="message-popup-container">' +
+                        '<p class="message-display">Wait a second to load list products !!</p>' +
+                        '</div>';
+                    $('.message-popup').html(insideMes);
+                    var kindId = $('#kindId').val();
+                    var categoryId = $('#categoryId').val();
+                    var minPrice = $('#minPrice').val();
+                    var maxPrice = $('#maxPrice').val();
+                    var productName = $('#productName').val();
+                    $.ajax({
+                        url: "/Product/SearchProductJson",
+                        type: "POST",
+                        data: '{kindId: "' + kindId + '",categoryId:"' + categoryId + '",minPrice:"' + minPrice + '",maxPrice:"' + maxPrice + '",productName:"' + productName + '",page:"' + page + '"}',
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        success: function (result) {
+                            if (result.NumProduct == 0) {
+                                $(".message-popup").removeClass("is-visible");
+                                $(".message-popup").addClass("is-visible");
+                                $(".message-popup").children(".message-popup-container").html('<p class="message-display">Result not found !!</p>' +
+                                    '<a href="#0" class="message-buttons" style="font-size: 20px; color: #000;">OK</a>' +
+                                    '<a href="#0" class="message-popup-close img-replace">Close</a>');
+                            }
+                            var insideRow = '';
+                            $.each(result.Products, function (key, product) {
+                                insideRow = insideRow +
+                                    '<div class="col-md-4 col-sm-6">' +
+                                    '<div class="single-food">' +
+                                    '<div class="food-img">' +
+                                    '<form action="/Admin/EditProduct" method="GET" >' +
+                                    '<input type="hidden" name="productId" value="' + product.ProductID + '"/>' +
+                                    '<input type="hidden" name="returnUrl" value="' + getReturnUrl() + '"/>' +
+                                    '<a href="#0" onclick="$(this).parent().submit();">' +
+                                    '<img src="/Product/GetImageProduct?productId=' + product.ProductID + '" class="img-fluid" alt="">'+
+                                    '</a>' +
+                                    '</form>' +
+                                    '</div>' +
+                                    '<div class="food-content">' +
+                                    '<div class="d-flex justify-content-between">' +
+                                    '<h5>' + product.ProductName + '</h5>' +
+                                    '<span class="style-change">' + product.Price + '$</span>' +
+                                    '</div>' +
+                                    '<p class="pt-3">' + product.Description + '</p>' +
+                                    '<div style="display: inline-block; font-size: 17px;">' +
+                                    '<form action="/Admin/EditProduct" method="GET" >' +
+                                    '<input type="hidden" name="productId" value="' + product.ProductID + '"/>' +
+                                    '<input type="hidden" name="returnUrl" value="' + getReturnUrl() + '"/>'+
+                                    '<a href="#0" onclick="$(this).parent().submit();" class="genric-btn primary" style="float:left;">Edit Product</a>' +
+                                    '</form>'+
+                                    '</div>' +
+                                    ' </div>' +
+                                    '</div>' +
+                                    '</div>';
+                            });
+                            $('#product-area').html(insideRow);
+                            $(".message-popup").removeClass("is-visible");
+
+                            Paging(result.PagingInfo, result.SearchInfo);
+                        }
+                    });
+                }
+    </script>
+        }
+        else
+        {
+            <script>
+                function searchProduct(page) {
+                    $(".message-popup").addClass("is-visible");
+                    var insideMes =
+                        '<div class="message-popup-container">' +
+                        '<p class="message-display">Wait us a second to load list products !!</p>' +
+                        '</div>';
+                    $('.message-popup').html(insideMes);
+                    var kindId = $('#kindId').val();
+                    var categoryId = $('#categoryId').val();
+                    var minPrice = $('#minPrice').val();
+                    var maxPrice = $('#maxPrice').val();
+                    var productName = $('#productName').val();
+
+                    $.ajax({
+                        url: "/Product/SearchProductJson",
+                        type: "POST",
+                        data: '{kindId: "' + kindId + '",categoryId:"' + categoryId + '",minPrice:"' + minPrice + '",maxPrice:"' + maxPrice + '",productName:"' + productName + '",page:"' + page + '"}',
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        success: function (result) {
+                            if (result.NumProduct == 0) {
+                                $(".message-popup").removeClass("is-visible");
+                                $(".message-popup").addClass("is-visible");
+                                $(".message-popup").children(".message-popup-container").html('<p class="message-display">Result not found !!</p>' +
+                                    '<a href="#0" class="message-buttons" style="font-size: 20px; color: #000;">OK</a>' +
+                                    '<a href="#0" class="message-popup-close img-replace">Close</a>');
+                            }
+                            var insideRow = '';
+                            $.each(result.Products, function (key, product) {
+                                insideRow = insideRow +
+                                    '<div class="col-md-4 col-sm-6">' +
+                                    '<div class="single-food">' +
+                                    '<div class="food-img">' +
+                                    '<a href="/Product/Details?productId=' + product.ProductID + '"><img src="/Product/GetImageProduct?productId=' + product.ProductID + '" class="img-fluid" alt=""></a>' +
+                                    '</div>' +
+                                    '<div class="food-content">' +
+                                    '<div class="d-flex justify-content-between">' +
+                                    '<h5>' + product.ProductName + '</h5>' +
+                                    '<span class="style-change">' + product.Price + '$</span>' +
+                                    '</div>' +
+                                    '<p class="pt-3">' + product.Description + '</p>' +
+                                    '<div style="display: inline-block; font-size: 17px;">' +
+                                    '<a href="/Product/Details?productId=' + product.ProductID + '" class="genric-btn primary" style="float:left;">View Details</a>' +
+                                    '<input type="submit" id="add-to-cart" onclick="displayPopup(' + product.ProductID + ');" class="genric-btn danger" name="action" value="Add to cart">' +
+                                    '</div>' +
+                                    '</div>' +
+                                    '</div>' +
+                                    '</div>';
+                            });
+                                $('#product-area').html(insideRow);
+                                $(".message-popup").removeClass("is-visible");
+                            
+                            Paging(result.PagingInfo, result.SearchInfo);
+                        }
+                    });
+
+                }
+            </script>
+        }
+    }
+    else
+    {
+        <script>
+            function searchProduct(page) {
+                $(".message-popup").addClass("is-visible");
+                var insideMes =
+                    '<div class="message-popup-container">' +
+                    '<p class="message-display">Wait us a second to load list products !!</p>' +
+                    '</div>';
+                $('.message-popup').html(insideMes);
+                var kindId = $('#kindId').val();
+                var categoryId = $('#categoryId').val();
+                var minPrice = $('#minPrice').val();
+                var maxPrice = $('#maxPrice').val();
+                var productName = $('#productName').val();
+                $.ajax({
+                    url: "/Product/SearchProductJson",
+                    type: "POST",
+                    data: '{kindId: "' + kindId + '",categoryId:"' + categoryId + '",minPrice:"' + minPrice + '",maxPrice:"' + maxPrice + '",productName:"' + productName + '",page:"' + page + '"}',
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (result) {
+                        if (result.NumProduct == 0) {
+                            $(".message-popup").removeClass("is-visible");
+                            $(".message-popup").addClass("is-visible");
+                            $(".message-popup").children(".message-popup-container").html('<p class="message-display">Result not found !!</p>' +
+                                '<a href="#0" class="message-buttons" style="font-size: 20px; color: #000;">OK</a>' +
+                                '<a href="#0" class="message-popup-close img-replace">Close</a>');
+                        } 
+                            var insideRow = '';
+                            $.each(result.Products, function (key, product) {
+                                insideRow = insideRow +
+                                    '<div class="col-md-4 col-sm-6">' +
+                                    '<div class="single-food">' +
+                                    '<div class="food-img">' +
+                                    '<a href="/Product/Details?productId=' + product.ProductID + '"><img src="/Product/GetImageProduct?productId=' + product.ProductID + '" class="img-fluid" alt=""></a>' +
+                                    '</div>' +
+                                    '<div class="food-content">' +
+                                    '<div class="d-flex justify-content-between">' +
+                                    '<h5>' + product.ProductName + '</h5>' +
+                                    '<span class="style-change">' + product.Price + '$</span>' +
+                                    '</div>' +
+                                    '<p class="pt-3">' + product.Description + '</p>' +
+                                    '<div style="display: inline-block; font-size: 17px;">' +
+                                    '<a href="/Product/Details?productId=' + product.ProductID + '" class="genric-btn primary" style="float:left;">View Details</a>' +
+                                    '<input type="submit" id="add-to-cart" onclick="displayPopup(' + product.ProductID + ');" class="genric-btn danger" name="action" value="Add to cart">' +
+                                    '</div>' +
+                                    ' </div>' +
+                                    '</div>' +
+                                    '</div>';
+                            });
+                            $('#product-area').html(insideRow);
+                            
+                            $(".message-popup").removeClass("is-visible");
+                        
+                        //get page
+                        Paging(result.PagingInfo, result.SearchInfo);
+                    },
+                    error: function (errormessage) {
+                        alert(errormessage.responseText);
+                    }
+                });
+            }
+        </script>
+    }
+}
+<script>
+    function Paging(pagingInfo, searchInfor) {
+        var htmlPage = '';
+        for (i = 1; i <= pagingInfo.TotalPages; i++) {
+            htmlPage = htmlPage + '<li class="';
+            if (i == pagingInfo.CurrentPage) {
+                htmlPage = htmlPage + 'active';
+            }
+            htmlPage = htmlPage + ' pager__item">' +
+                '<a class="' + 'pager__link"' + ' href="#0" onclick=" scrollPage(); searchProduct(' + i + ');">' + i + '</a>' +
+                '</li>';
+        }
+        $('#paging-here').html(htmlPage);
+    }
+</script>
+<div class="cd-popup" role="alert" id="cd-popup">
+    <div class="cd-popup-container">
+        <p class="message-display"></p>
+        <ul class="cd-buttons">
+            <li>
+                <a href="#0" id="addcart">Yes</a>
+                <input type="hidden" id="productID" name="productID" value="">
+                <input type="hidden" id="quantity" name="quantity" value="1">
+            </li>
+            <li><a href="#0" class="cd-no">No</a></li>
+        </ul>
+        <a href="#0" class="cd-popup-close img-replace">Close</a>
+    </div> <!-- cd-popup-container -->
+</div> <!-- cd-popup -->
+@if (User.Identity.IsAuthenticated)
+{
+    <script>
+        function displayPopup(prodID) {       
+            $('#cd-popup').addClass('is-visible');
+            $('.cd-popup-container').children('p').replaceWith('<p class="message-display">Are you sure you want to add this food to your cart?</p>');
+            $('#productID').val(prodID);        
+        }
+    </script>
+}
+else
+{
+    <script>
+        function displayPopup(prodID) {           
+            displayLogin();
+        }
+    </script>
+}
+<script>
+    function scrollPage() {
+        $('html, body').animate({
+            scrollTop: $("#scroll-here").offset().top
+        }, 1000);
+    }
+</script>
+
+<script src="~/Scripts/add-to-cart.js"></script>
+<script src="~/assets/product-js/pop-up.js"></script>
+

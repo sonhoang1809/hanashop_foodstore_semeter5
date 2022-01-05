@@ -1,0 +1,152 @@
+﻿@{
+    Layout = null;
+    
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Check Out</title>
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="~/assets/images/logo/favicon.png" type="image/x-icon">
+    <link rel="stylesheet" href="~/assets/style/style-payment.css">
+    <link rel="stylesheet" href="~/assets/style/pop-up-message-out-of-stock.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+</head>
+<body>
+    <div>
+        <div class="body-text"><h2>CHOOSE A METHOD PAYMENT</h2></div>
+        <form action="/CheckOut/Index" method="POST">
+            <input type="hidden" name="returnUrl" value="@Request["returnUrl"]" />
+            <input type="hidden" name="fullname" value="@Request["fullname"]" />
+            <input type="hidden" name="address" value="@Request["address"]" />
+            <input type="hidden" name="street" value="@Request["street"]" />
+            <input type="hidden" name="city" value="@Request["city"]" />
+            <input type="hidden" name="phone" value="@Request["phone"]" />
+            <input type="hidden" name="IDBill" value="@Request["IDBill"]">
+            <a href="#0" onclick="$(this).closest('form').submit();">< Back to Payment Information</a>
+        </form>
+        <br>
+        <div class="form-container" id="here">
+            <div class="personal-information">
+                <h1>Payment Information</h1>
+            </div> <!-- end of personal-information -->
+            <br>
+            <form action="/CheckOut/FinishOrderCOD" method="POST">
+                <input type="hidden" name="fullname" value="@Request["fullname"]" />
+                <input type="hidden" name="address" value="@Request["address"]" />
+                <input type="hidden" name="street" value="@Request["street"]" />
+                <input type="hidden" name="city" value="@Request["city"]" />               
+                <input type="hidden" name="IDBill" value="@Request["IDBill"]">
+                <input id="input-button" type="submit" value="Cash On Delivery" />
+            </form>
+            <br>            
+            <form id="form-paypal" action="/CheckOut/CreateOrderPaypal" method="POST">
+                <input type="hidden" name="fullname" value="@Request["fullname"]" />
+                <input type="hidden" name="address" value="@Request["address"]" />
+                <input type="hidden" name="street" value="@Request["street"]" />
+                <input type="hidden" name="city" value="@Request["city"]" />                
+                <input type="hidden" name="IDBill" value="@Request["IDBill"]">
+                <input class="fa-paypal" type="submit" onclick="displayMess();" value="Pay now with Paypal" />
+            </form>
+        </div>
+        
+        <div id="paypal-button-container"></div>
+    <script src="https://www.paypal.com/sdk/js?client-id=Aa7AndcgAFRz297Bs1DHn0KW-w8eaIqen3hxRGwDZL3hmGHfdsMtL8GipWlpfu7svoBA8AgaqObgHlM8&intent=authorize&currency=USD"></script>
+    <script>
+        // Render the PayPal button into #paypal-button-container
+        paypal.Buttons({
+            style: {
+                layout: 'horizontal'
+            },
+            env: 'sandbox',
+
+            createOrder: function (data, actions) {
+                console.log("create order");
+                return fetch('/CheckOut/CreateOrderPaypal', {
+                    method: 'post',
+                    headers: {
+                        'content-type': 'application/json'
+                    }
+                }).then(response => response.json())
+                    .then(data => data.Id);   
+            },
+            // Call your server to finalize the transaction
+            //onApprove: function (data, actions) {
+            //    return fetch('/CheckOut/AuthorizeCaptureOrderPaypal?token=' + data.orderID, {
+            //        method: 'get'
+            //    }).then(function (res) {
+            //        console.log("Log: " + res);
+            //        return res;
+            //    }).then(function (orderData) {
+            //        // Three cases to handle:
+            //        //   (1) Recoverable INSTRUMENT_DECLINED -> call actions.restart()
+            //        //   (2) Other non-recoverable errors -> Show a failure message
+            //        //   (3) Successful transaction -> Show a success / thank you message
+
+            //        // Your server defines the structure of 'orderData', which may differ
+            //        var errorDetail = Array.isArray(orderData.details) && orderData.details[0];
+
+            //        if (errorDetail && errorDetail.issue === 'INSTRUMENT_DECLINED') {
+            //            // Recoverable state, see: "Handle Funding Failures"
+            //            // https://developer.paypal.com/docs/checkout/integration-features/funding-failure/
+            //            return actions.restart();
+            //        }
+
+            //        if (errorDetail) {
+            //            var msg = 'Sorry, your transaction could not be processed.';
+            //            if (errorDetail.description) msg += '\n\n' + errorDetail.description;
+            //            if (orderData.debug_id) msg += ' (' + orderData.debug_id + ')';
+            //            // Show a failure message
+            //            return alert(msg);
+            //        }
+
+            //        // Show a success message to the buyer
+            //        alert('Transaction completed by ' + orderData.payer.name.given_name);
+            //    });
+            //}
+            //onAuthorize: function (data, actions) {
+            //    return actions.payment.execute().then(function () {
+            //        // Show a confirmation message to the buyer
+            //        window.alert('Thank you for your purchase!');
+            //    });
+            //}
+        }).render('#paypal-button-container');
+    </script>
+    
+        <div class="message-popup" role="alert">
+            <div class="message-popup-container">
+                @{
+                    if (ViewBag.ErrorPayPal != null)
+                    {
+                        <p class="message-display">ViewBag.ErrorPayPal</p>
+                    }
+                }
+                <p></p>
+                <a href="#0" class="message-buttons" style="color: #000; font-size: 20px;">OK</a>
+                <a href="#0" class="message-popup-close img-replace">Close</a>
+            </div> <!-- message-popup-container -->
+        </div> <!-- message-popup -->
+        <script>
+            function displayMess() {
+                $('.message-popup').addClass('is-visible');
+                var insideMess = '<p class="message-display">Wait us a second to send your bill to PayPal!!</p>';
+                $('.message-popup-container').html(insideMess);
+            }
+        </script>
+        @{
+            if (ViewBag.ErrorPayPal != null)
+            {
+                <script>
+                    $(".message-popup").addClass("is-visible");
+                </script>
+            }
+        }
+    </div>
+
+
+</body>
+</html>

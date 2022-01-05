@@ -1,0 +1,41 @@
+﻿<nav class="navbar navbar-expand-xl">
+    <div class="container h-100">
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mx-auto h-100">
+                <li class="nav-item">
+                    <form action="manage-hanashop.jsp" method="POST">
+                        <input type="hidden" name="date" value="">
+                        <a class="nav-link" href="manage-hanashop.jsp">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <h5>Dashboard</h5>
+                        </a>
+                    </form>
+                </li>
+                <li class="nav-item">
+                    @*<form class="nav-link active" action="manage-food.jsp" method="POST">*@
+                    @using (Html.BeginForm("ManageProduct", "Manager", FormMethod.Get, new { @class = "nav-link active" })) {
+                        <input type="hidden" name="kindID" value="@ViewBag.SelectedKind">
+                        <input type="hidden" name="categoryID" value="@ViewBag.SelectedCategory">
+                        <a href="#0" onclick="$(this).closest('form').submit();">
+                            <i class="fas fa-shopping-cart"></i>
+                            <h5>Foods</h5>
+                            <span class="sr-only">(current)</span>
+                        </a>
+                    }
+
+                    @*</form>*@
+                </li>
+                <li class="nav-item">
+                    <form action="manage-account.jsp" method="POST">
+                        <input type="hidden" name="kindIDAd" value="">
+                        <input type="hidden" name="categoryIDAd" value="">
+                        <a class="nav-link" href="#0" onclick="$(this).closest('form').submit();">
+                            <i class="far fa-user"></i>
+                            <h5>Accounts</h5>
+                        </a>
+                    </form>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>

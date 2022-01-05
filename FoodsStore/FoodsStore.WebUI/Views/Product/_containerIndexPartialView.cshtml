@@ -1,0 +1,201 @@
+﻿
+<script src="https://use.fontawesome.com/releases/v5.11.2/js/all.js" data-auto-replace-svg="nest"></script>
+<link rel="stylesheet" href="~/assets/style/pop-up-confirm.css" />
+<link rel="stylesheet" href="~/assets/style/pop-up-message-out-of-stock.css" />
+<link rel="stylesheet" href="~/assets/style/style-paging.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+
+
+
+<!-- Food Area starts -->
+@Html.Partial("~/Views/Product/_productAreaSearchPartialView.cshtml")
+<!-- Food Area End -->
+<!-- Reservation Area Starts -->
+<!--Đây chỉ là banner cho đẹp-->
+<div class="reservation-area section-padding text-center">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <h2>Natural ingredients and testy food</h2>
+                <h4 class="mt-4">some trendy and popular courses offerd</h4>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Reservation Area End -->
+
+
+<div id="p-up-confirm-email" class="cd-popup" role="alert">
+    <div class="cd-popup-container">
+        <p>We sent to you a code to confirm this email. Please check your email and confirm the code !</p>
+        <form action="VerifyEmailController" method="POST">
+            <input name="codeConfirm" type="number" class="form-control validate" required="" />
+            <input type="hidden" name="userID" value="" />
+            <input type="hidden" name="email" value="" />
+            <input type="hidden" name="userName" value="" />
+            <input type="hidden" name="password" value="" />
+            <input type="hidden" name="confirm" value="" />
+            <ul class="cd-buttons">
+                <li>
+                    <a href="#0" class="message-buttons" onclick="$(this).closest('form').submit();"
+                       style="font-size: 20px; color: #000;">Confirm</a>
+                </li>
+            </ul>
+        </form>
+        <form action="SendCodeUserController" method="POST">
+            <input type="hidden" name="userID" value="" />
+            <input type="hidden" name="email" value="" />
+            <input type="hidden" name="userName" value="" />
+            <input type="hidden" name="password" value="" />
+            <input type="hidden" name="confirm" value="" />
+            <ul class="cd-buttons">
+                <li><a href="#0" style=" color: #000;" onclick="$(this).closest('form').submit();">Send new code</a></li>
+                <li><a href="#0" class="cd-no">Back</a></li>
+            </ul>
+        </form>
+        <a href="#0" class="cd-popup-close img-replace">Close</a>
+    </div>
+</div>
+
+
+<div class="message-popup" role="alert">
+    <div class="message-popup-container">
+        @{
+            if (TempData["MessageWelcome"] != null)
+            {
+                <p class="message-display">@TempData["MessageWelcome"]</p>
+            }
+            if (@ViewBag.SearchNull != null)
+            {
+                <p class="message-display">@ViewBag.SearchNull</p>
+            }
+            if (TempData["ERRORCODECONFIRM"] != null)
+            {
+                <p class="message-display">@TempData["ERRORCODECONFIRM"]</p>
+            }
+            if (TempData["LOGINERROR"] != null)
+            {
+                <p class="message-display">
+                    @TempData["LOGINERROR"] <br>
+
+                </p>
+            }
+            if (@ViewBag.SIGNUPERROR != null)
+            {
+                <p class="message-display">
+                    @ViewBag.SIGNUPERROR
+
+                </p>
+            }
+
+            if (@ViewBag.ErrorFood != null)
+            {
+                <p class="message-display">@ViewBag.ErrorFood</p>
+            }
+
+            if (@ViewBag.QuantityError != null)
+            {
+                <p class="message-display">@ViewBag.QuantityError</p>
+            }
+            if (@TempData["InavailableProd"] != null)
+            {
+                <p class="message-display">@TempData["InavailableProd"]</p>
+            }
+            if (TempData["PaymentMessage"] != null)
+            {
+                <p class="message-display" style="font-size: 20px; color: #000;">@TempData["PaymentMessage"]</p>
+                <form action="/CheckOut/ViewOrderDetails" method="POST">
+                    <input type="hidden" name="IDBill" value="@TempData["BillID"]">
+                    <a href="#0" onclick="$(this).closest('form').submit();"
+                       style="font-size: 20px; color: #000;">Check Your Bill</a>
+                </form>
+                <br>
+            }
+        }
+        <a href="#0" class="message-buttons" style="font-size: 20px; color: #000;">OK</a>
+        <a href="#0" class="message-popup-close img-replace">Close</a>
+    </div> <!-- message-popup-container -->
+</div> <!-- message-popup -->
+
+
+@{
+    //pop up welcome
+    if (TempData["MessageWelcome"] != null)
+    {
+        <script>
+            $(".message-popup").addClass("is-visible");
+            $(".message-popup-container a*").remove();
+            window.setTimeout(function () {
+                $(".message-popup").removeClass("is-visible");
+            }, 2900);
+            window.setTimeout(function () {
+                var insideMess = '<a href="#0" class="message-buttons" style="font-size: 20px; color: #000;">OK</a>' +
+                    '<a href="#0" class="message-popup-close img-replace">Close</a>';
+                $(".message-popup-container").html(insideMess);
+            }, 3500);
+        </script>
+    }
+    //popup search null
+    if (ViewBag.SearchNull != null)
+    {
+        <script>
+            $(".message-popup").addClass("is-visible");
+        </script>
+    }
+    if (TempData["InavailableProd"] != null)
+    {
+        <script>
+            $(".message-popup").addClass("is-visible");
+        </script>
+    }
+    if (TempData["PaymentMessage"] != null)
+    {
+        <script>
+            $(".message-popup").addClass("is-visible");
+        </script>
+    }
+    if (ViewBag.ERRORCODECONFIRM != null)
+    {
+        <script>
+            $(".message-popup").addClass("is-visible");
+            $("#p-up-confirm-email").addClass("is-visible");
+        </script>
+    }
+    if (ViewBag.LOGINERROR != null)
+    {
+        <script>
+            $(".message-popup").addClass("is-visible");
+        </script>
+    }
+    if (ViewBag.SIGNUPERROR != null)
+    {
+        <script>
+            $(".message-popup").addClass("is-visible");
+        </script>
+    }
+    if (ViewBag.MessageConfirmEmail != null)
+    {
+        <script>
+            displaySignup();
+            $("#p-up-confirm-email").addClass("is-visible");
+        </script>
+    }
+}
+
+<script>
+    function checkLoginYet() {
+        if (@User == null) {
+            event.preventDefault();
+            displayLogin();
+        }
+    }
+</script>
+
+<!-- Javascript -->
+
+<script src="~/assets/product-js/pop-up.js"></script>
+<script src="~/assets/product-js/page.js"></script>
+<script src="~/assets/product-js/pop-up-confirm.js"></script>
+<script src="~/assets/product-js/pop-up-message-out-of-stock.js"></script>
+

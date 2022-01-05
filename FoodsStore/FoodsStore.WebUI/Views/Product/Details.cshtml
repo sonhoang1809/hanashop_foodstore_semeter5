@@ -1,0 +1,133 @@
+﻿@model FoodsStore.Domain.Entities.Product
+
+@{
+    ViewBag.Title = "Details Product";
+    Layout = "~/Views/Shared/_ProductLayout.cshtml";
+    TempData["currentIDProduct"] = Model.ProductID;
+}
+<head>
+    <!-- Favicon -->
+    <link rel="stylesheet" href="~/assets/style/style-food-details.css" />
+    <link rel="stylesheet" href="~/assets/style/pop-up-message-out-of-stock.css" />
+    <link rel="stylesheet" href="~/assets/style/pop-up-confirm.css" />
+    <link rel="stylesheet" href="~/assets/css/nice-select.css" type="text/css">
+    <link rel="stylesheet" href="~/assets/style/upload-pic-food.css" type="text/css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+</head>
+<!-- Food Details Use Starts -->
+<input type="hidden" class="currentIDProduct" value="@Model.ProductID" />
+<section class="welcome-area section-padding2">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-6 align-self-center">
+                <div class="welcome-img">
+                    <img src="@Url.Action("GetImageProduct", "Product", new { Model.ProductID })" class="img-fluid" alt=""
+                         style="padding-left: 120px; width: 620px; height: 500px;">
+                </div>
+            </div>
+            <div class="col-md-6 align-self-center">
+                <div class="welcome-text mt-5 mt-md-0">
+                    <h3><span class="style-change">@Model.ProductName </span></h3>
+                    <h5>Kind: @Html.Action("GetProductKindName", "Product", new { productId = Model.ProductID })</h5>
+                    <h5>Category: @Html.Action("GetProductCategoryName", "Product", new { productId = Model.ProductID })</h5>
+                    <h5>Create Date: @Model.DateCreated.ToShortDateString()</h5>
+                    <h5>Status: @Html.Action("GetProductStatusName", "Product", new { productId = Model.ProductID })</h5>
+                    <p class="pt-3">@Model.Description</p>
+                    <h5>
+                        Price:
+                        <span class="price">@Model.Price.ToString("c")</span>
+                    </h5>
+                    <h5>Quantity:</h5>
+                    <span class="btn btn-group qt-minus">-</span>
+                    <span class="qt" style="font-size: 20px;" id="quantityProd">1</span>
+                    <span class="btn btn-group qt-plus">+</span>
+
+                    <br><br><br>
+                    <input type="submit" id="add-to-cart" class="btn btn-group template-btn mt-3" onclick="displayPopupAtDetails(@Model.ProductID);" value="Add to cart">
+
+                    <br>
+                    <br>
+                    <form action="SearchController" method="POST">
+                        <a href="#0" onclick="$(this).closest('form').submit();">Continue Shopping</a>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+<div class="message-popup" role="alert">
+    <div class="message-popup-container">
+        @{
+            if (TempData["MessageWelcome"] != null)
+            {
+                <p class="message-display">@TempData["MessageWelcome"]</p>
+            }
+        }
+        <a href="#0" class="message-buttons" style="color: #000; font-size: 20px;">OK</a>
+        <a href="#0" class="message-popup-close img-replace">Close</a>
+    </div> <!-- message-popup-container -->
+</div> <!-- message-popup -->
+<div class="cd-popup" role="alert" id="cd-popup">
+    <div class="cd-popup-container">
+        
+            <p class="message-display">Are you sure you want to add this food to your cart?</p>
+            <ul class="cd-buttons">
+                <li>
+                    <a href="#0" id="addcart">Yes</a>
+                    <input type="hidden" id="productID" name="productID" value="">
+                    <input type="hidden" id="quantity" name="quantity" value="1">
+                </li>
+                <li><a href="#0" class="cd-no">No</a></li>
+            </ul>
+            <a href="#0" class="cd-popup-close img-replace">Close</a>
+        </div> <!-- cd-popup-container -->
+</div> <!-- cd-popup -->
+@if (User.Identity.IsAuthenticated)
+{
+    <script>
+        function displayPopupAtDetails(prodID) {
+            var quantity = $('#quantityProd').text();
+            $('#productID').val(prodID);
+            $('#quantity').val(quantity);
+            $('#cd-popup').addClass('is-visible');
+        }
+    </script>
+}
+else
+{
+    <script>
+        function displayPopupAtDetails(prodID) {
+            displayLogin();
+        }
+    </script>
+}
+<!-- Food Details User End -->
+<!-- Recommend Starts -->
+@Html.Action("GetSameCategoryOfProducts", "Product", new { productId = Model.ProductID, quantityProduct = 3 })
+<!-- Recommend End -->
+
+@{    
+    if (TempData["MessageWelcome"] != null)
+    {
+    <script>
+        $(".message-popup").addClass("is-visible");
+        $(".message-popup-container a*").remove();
+        window.setTimeout(function () {
+            $(".message-popup").removeClass("is-visible");
+        }, 2900);
+        window.setTimeout(function () {
+            var insideMess = '<a href="#0" class="message-buttons" style="font-size: 20px; color: #000;">OK</a>' +
+                '<a href="#0" class="message-popup-close img-replace">Close</a>';
+            $(".message-popup-container").html(insideMess);
+        }, 3500);
+    </script>
+    }
+    }
+<script src="~/assets/product-js/pop-up.js"></script>
+<script src="~/assets/product-js/login-signup.js"></script>
+<script src="~/Scripts/add-to-cart.js"></script>
+<script src="~/assets/product-js/update-food.js"></script>
+<script src="~/assets/product-js/food-details.js"></script>
+<script src="~/assets/product-js/pop-up-confirm.js"></script>
+<script src="~/assets/product-js/pop-up-message-out-of-stock.js"></script>

@@ -1,0 +1,76 @@
+﻿@using FoodsStore.WebUI.Models;
+@{
+    Layout = null;
+}
+@model FoodsStore.WebUI.Models.CartDetailsModel
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Order Details</title>
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="~/Content/images/logo/favicon.png" type="image/x-icon">
+    <link rel="stylesheet" href="~/Content/style/style-shopping-cart2.css" />
+    <link rel="stylesheet" href="~/Content/style/pop-up-confirm.css" />
+    <link rel="stylesheet" href="~/Content/style/pop-up-message-out-of-stock.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+</head>
+<body>
+    <header id="site-header">
+        <div class="container">
+            <h1>Order details <span>[</span><em>@Html.Action("GetFullNameUser", "Account", new { username = HttpContext.Current.User.Identity.Name })</em><span>]</span></h1>
+            <h1>Bill ID: <span>[</span><em>@Model.BillID</em><span>]</span></h1>
+            @using (Html.BeginForm("Index", "Product", FormMethod.Post, new { @class = "btn" }))
+            {
+                <a href="#" onclick="$(this).closest('form').submit();">Continue Shopping</a>
+            }
+        </div>
+    </header>
+    <div class="container">
+        <section id="cart">
+            @{
+                foreach (var x in Model.ProductsInCart)
+                {
+                        <article class="product" id="@x.ProductID">
+                            <header>
+                                <form action="/Product/Details" method="POST">
+                                    <input type="hidden" name="productId" value="@x.ProductID">
+                                    <a class="view-details-food" onclick="$(this).closest('form').submit();">
+                                        <img src="/Product/GetImageProduct?productId=@x.ProductID" alt="">
+                                        <h3>View details</h3>
+                                    </a>
+                                </form>
+                            </header>
+                            <div class="content">
+                                <h2 id="prodName-@x.ProductID">@x.ProductName</h2>
+                                @x.ShortDescription
+                            </div>
+                            <footer class="content">
+                                <input type="hidden" id="idProdHere" value="@x.ProductID" />
+                                <input type="hidden" id="idBillHere" value="@Model.BillID" />                           
+                                <span id="qua-@x.ProductID">Quantity: @x.Quantity</span>                                                                               
+                                <h5 class="full-price">@x.Total$</h5>
+                                <h5 class="price">@x.Price$</h5>
+                            </footer>
+                        </article>
+                }
+                }
+        </section>
+    </div>
+    <footer id="site-footer">
+        <div class="container clearfix">
+            @{
+                <div class="left">
+                    <h2 class="subtotal">Subtotal: <span>@Model.SubTotal</span>$</h2>
+                    <h2 class="tax">Taxes (10%): <span>@Model.Tax</span>$</h2>
+                    <h2>Last time change:@Model.LastTimeChange</h2>
+                </div>
+                <div class="right">
+                    <h1 class="total">Total: <span>@Model.Total</span>$</h1>                         
+                </div>
+             }
+            </div>
+    </footer>
+</body>
+</html>

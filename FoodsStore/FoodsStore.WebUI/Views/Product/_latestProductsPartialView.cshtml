@@ -1,0 +1,68 @@
+﻿@model IEnumerable<FoodsStore.Domain.Entities.Product>
+@{ 
+    Layout = null;
+
+}
+
+<section class="update-area section-padding">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="section-top2 text-center">
+                    <h3>Our <span>new</span> products</h3>
+                    <p><i>All for customers - customers for all.</i></p>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+             
+            @foreach (var product in Model)
+            {
+                string linkOfProductDetails = Url.Action("Details", "Product", new { productId = product.ProductID });
+                if (User.Identity.IsAuthenticated) {
+                    if (HttpContext.Current.User.IsInRole("Admin")) {
+                        linkOfProductDetails = Url.Action("EditProduct", "Admin", new { productId = product.ProductID, returnUrl = Request.Url.PathAndQuery });
+                    }
+                }
+
+                <div class="col-md-4">
+                    <div class="single-food">
+                        <div class="food-img">
+                            <a href="@linkOfProductDetails"><img src="@Url.Action("GetImageProduct", "Product", new { product.ProductID })" class="img-fluid" alt=""></a>
+                        </div>
+                        <div class="food-content">
+                            <div class="d-flex justify-content-between">
+                                <h5>@product.ProductName</h5>
+                                <span class="style-change">@product.Price.ToString("c")</span>
+                            </div>
+                            Kind: @Html.Action("GetProductKindName", "Product", new { productId = product.ProductID }) <br>
+                            Category: @Html.Action("GetProductCategoryName", "Product", new { productId = product.ProductID }) <br>
+
+                            <p class="pt-3">@product.Description</p>
+
+                            <div style="display: inline-block; font-size: 17px;">
+                                @if (User.Identity.IsAuthenticated) {
+                                    if (HttpContext.Current.User.IsInRole("Admin")) {
+                                        @Html.ActionLink("Edit Product", "EditProduct", "Admin", new { productId = product.ProductID, returnUrl = Request.Url.PathAndQuery }, new { @class = "genric-btn primary", style = "float:left;" })
+                                    } else {
+                                        <input type="submit" onclick="displayPopup(@product.ProductID);" id="add-to-cart" class="genric-btn danger" name="action" value="Add to cart" />
+                                        @Html.ActionLink(" View Details", "Details", "Product", new { productId = product.ProductID }, new { @class = "genric-btn primary", style = "float:left;" })
+                                    }
+                                } else {
+                                    <input type="submit" onclick="displayPopup(@product.ProductID);" id="add-to-cart" class="genric-btn danger" name="action" value="Add to cart" />
+                                    @Html.ActionLink(" View Details", "Details", "Product", new { productId = product.ProductID }, new { @class = "genric-btn primary", style = "float:left;" })
+                                }
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+
+
+        </div>
+    </div>
+</section>
+
+

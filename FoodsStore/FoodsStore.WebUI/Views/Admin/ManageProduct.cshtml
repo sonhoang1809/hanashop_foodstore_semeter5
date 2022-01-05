@@ -1,0 +1,162 @@
+﻿@model FoodsStore.WebUI.Models.ProductListEditModel
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewBag.Title = "Manage Food Hana Shop";
+    ViewBag.SelectedView = "ManageProduct";
+    int count = 0;
+}
+<link rel="stylesheet" href="~/assets/style/templatemo-style.css">
+<div class="" id="home">
+    @Html.Partial("~/Views/Admin/_NavbarPartialView.cshtml")
+    <div class="container">
+        <div class="container mt-5">
+            <div class="row tm-content-row">
+                <div class="col-12 tm-block-col">
+                    <div class="tm-bg-primary-dark tm-block tm-block-h-auto">
+                        <h4 class="tm-block-title">List Kind</h4>
+                        <div class="col-lg-8 offset-lg-2">
+                            @using (Html.BeginForm("ManageProduct", "Admin", FormMethod.Get))
+                            {
+                                <select class="custom-select" name="kindId" onchange="this.form.submit();">
+                                    @foreach (var item in Model.Kinds)
+                                    { //"KINDS" lấy từ AdminController/ManageProduct Action Method
+                                        string active = "";
+                                        if (Model.SelectedKind == item.KindID)
+                                        {
+                                            active = "selected";
+                                        }
+                                        <option @active value="@item.KindID">@item.KindOfProduct</option>
+                                    }
+                                </select>
+                            }
+                            <div style="height: 50px;"></div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="row tm-content-row">
+                <div class="col-sm-12 col-md-12 col-lg-8 col-xl-8 tm-block-col">
+                    <div class="tm-bg-primary-dark tm-block tm-block-products">
+                        <h4 class="tm-block-title">Product List</h4>
+                        <div class="tm-product-table-container">
+                            <table class="table table-hover tm-table-small tm-product-table">
+                                <thead style="border-top: 1px solid #333;position: sticky;top: 0;background-color: red;">
+                                    @*I want to fixed thead but I failed*@
+                                    <tr>
+                                        <th scope="col">STT</th>
+                                        <th scope="col">Food Name</th>
+                                        <th scope="col">Status</th>
+                                        <th scope="col">Price</th>
+                                        <th scope="col">Quantity</th>
+                                        <th scope="col">Create date</th>
+                                        <th scope="col">Update date</th>
+                                        <th scope="col">Update User</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+
+                                    @foreach (var item in Model.Products)
+                                    {
+                                        <tr style="cursor: pointer;" onclick="document.getElementById('@item.ProductID' + 'forSubmit').submit();">
+                                            <td>@(++count)</td>
+                                            <td>@item.ProductName</td>
+                                            <td>
+
+
+                                                <div class="tm-status-circle moving">
+                                                </div> @Html.Action("GetProductStatusName", "Product", new { productId = item.ProductID })
+
+
+                                            </td>
+                                            <td>@item.Price.ToString("c")</td>
+                                            <td>@item.Quantity</td>
+                                            <td>@item.DateCreated.ToShortDateString()</td>
+                                            <td>@item.DateModified</td>
+                                            <td>@item.UserModified</td>
+                                            <td style="display: none;">
+                                                @*<form style="display: none;" action="EditProduct" method="GET" id="@item.CategoryID">
+                                                        <input type="hidden" name="productId" value="@item.ProductID">
+                                                        <input type="hidden" name="returnUrl" value="@Request.Url.PathAndQuery">
+                                                    </form>*@
+
+                                                @using (Html.BeginForm("EditProduct", "Admin", FormMethod.Get, new { id = item.ProductID + "forSubmit" }))
+                                                {
+                                                    <input type="hidden" name="productId" value="@item.ProductID">
+                                                    <input type="hidden" name="returnUrl" value="@Request.Url.PathAndQuery">
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- table container -->
+                        <div class="col-12">
+                            @*<form action="add-food.jsp" method="POST">
+                                    <input type="hidden" name="kindIDAd" value="">
+                                    <input type="hidden" name="categoryIDAd" value="">
+                                    <button type="submit" style="font-size: 20px;" class="genric-btn warning btn btn-block text-uppercase">Add Product Now</button>
+                                </form>*@
+                            @*@Html.ActionLink("Add Product Now", "CreateProduct", "Admin", new { }, new { @class = "genric-btn warning btn btn-block text-uppercase", @style = "font-size: 20px;" })*@
+                            @using (Html.BeginForm("CreateProduct", "Admin", FormMethod.Get))
+                            {
+                                <input type="hidden" name="returnUrl" value="@Request.Url.PathAndQuery">
+                                <input type="submit" value="Add Product Now" class="genric-btn warning btn btn-block text-uppercase" style="font-size: 20px;" />
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-12 col-md-12 col-lg-4 col-xl-4 tm-block-col">
+                    <div class="tm-bg-primary-dark tm-block tm-block-product-categories">
+                        <h4 class="tm-block-title">Product Categories</h4>
+                        <div class="tm-product-table-container">
+                            <table class="table table-hover tm-table-small tm-product-table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">STT</th>
+                                        <th scope="col">CATEGORY NAME</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @{ count = 0; }
+                                    @foreach (var item in Model.Categories)
+                                    {
+                                        string active = "";
+                                        if (Model.SelectedCategory == item.CategoryID)
+                                        {
+                                            active = "background-color:#6ca7d4;";
+                                        }
+                                        <tr style="cursor: pointer;@active" onclick="document.getElementById('@item.CategoryID' + 'forSubmit').submit();">
+
+                                            <td>@(++count)</td>
+                                            <td>
+                                                @item.CategoryName (@Html.Action("NumberOfProduct", "Admin", new { categoryId = item.CategoryID }))
+                                            </td>
+                                            <td style="display: none;">
+                                                @*<form style="display: none;" action="ManageProduct" method="GET" id="@item.CategoryName">
+                                                        <input type="hidden" name="categoryId" value="@item.CategoryID">
+                                                       <input type="hidden" name="kindIDAd" value="">
+                                                    </form>*@
+
+                                                @using (Html.BeginForm("ManageProduct", "Admin", FormMethod.Get, new { id = @item.CategoryID + "forSubmit", style = "display: none;" }))
+                                                {
+                                                    <input type="hidden" name="categoryId" value="@item.CategoryID">
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- table container -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/assets/js/vendor/jquery-2.2.4.min.js"></script>

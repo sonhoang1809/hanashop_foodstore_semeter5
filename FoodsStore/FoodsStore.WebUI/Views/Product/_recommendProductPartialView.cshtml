@@ -1,0 +1,73 @@
+﻿@model IEnumerable<FoodsStore.Domain.Entities.Product>
+@{
+    Layout = null;
+    int count = 0;
+}
+<!-- Reservation Area Starts -->
+<!--Đây chỉ là banner cho đẹp-->
+<div class="reservation-area section-padding text-center">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <h2>Natural ingredients and testy food</h2>
+                <h4 class="mt-4">some trendy and popular courses offerd</h4>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Reservation Area End -->
+<div class="deshes-area section-padding">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="section-top2 text-center">
+                    <h3>You <span>May</span> Also Like</h3>
+                </div>
+            </div>
+        </div>
+
+        @foreach (var product in Model)
+        {
+            if (++count % 2 == 0)
+            {
+                <div class="row">
+                    <div class="col-lg-5 col-md-6 align-self-center">
+                        <h1>@count.ToString("##").</h1>
+                        <div class="deshes-text">
+                            <h3><span>@product.ProductName</span></h3>
+                            <p class="pt-3">@product.Description</p>
+                            <span class="style-change">@product.Price.ToString("c")</span>
+                            <div style="display: inline-block; font-size: 17px;">
+                                @Html.ActionLink("View Details", "Details", "Product", new { productId = product.ProductID }, new { @class = "genric-btn primary", style = "float: left;" })
+                                <input type="submit" id="add-to-cart" class="genric-btn danger" onclick="displayPopupAtDetails(@product.ProductID);" name="action" value="Add to cart">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-5 offset-lg-2 col-md-6 align-self-center mt-4 mt-md-0">
+                        <img src="@Url.Action("GetImageProduct", "Product", new { product.ProductID })" alt="" class="img-fluid">
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="row mt-5">
+                    <div class="col-lg-5 col-md-6 align-self-center order-2 order-md-1 mt-4 mt-md-0">
+                        <img src="@Url.Action("GetImageProduct", "Product", new { product.ProductID })" alt="" class="img-fluid">
+                    </div>
+                    <div class="col-lg-5 offset-lg-2 col-md-6 align-self-center order-1 order-md-2">
+                        <h1>@count.</h1>
+                        <div class="deshes-text">
+                            <h3><span>@product.ProductName</span><br></h3>
+                            <p class="pt-3">@product.Description</p>
+                            <span class="style-change">@product.Price.ToString("c")</span>
+                            <div style="display: inline-block; font-size: 17px;">
+                                @Html.ActionLink("View Details", "Details", "Product", new { productId = product.ProductID }, new { @class = "genric-btn primary", style = "float: left;" })
+                                <input type="submit" id="add-to-cart" class="genric-btn danger" onclick="displayPopupAtDetails(@product.ProductID);" name="action" value="Add to cart">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>

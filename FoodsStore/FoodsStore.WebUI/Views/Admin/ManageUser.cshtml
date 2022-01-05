@@ -1,0 +1,98 @@
+﻿@model FoodsStore.WebUI.Models.UserListEditModel
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewBag.Title = "Manage Account Hana Shop";
+    ViewBag.SelectedView = "ManageUser";
+}
+
+<link rel="stylesheet" href="~/assets/style/templatemo-style.css">
+
+@Html.Partial("_NavbarPartialView")
+
+<div class="row tm-content-row">
+    <div class="col-12 tm-block-col">
+        <div class="tm-bg-primary-dark tm-block tm-block-h-auto">
+            <h4 class="tm-block-title">Role: </h4>
+            @using (Html.BeginForm("ManageUser", "Admin"))
+            {
+                <select class="custom-select" name="roleId" onchange="$(this).closest('form').submit();">
+
+                    @foreach (var role in Model.Roles)
+                    {
+                        string active = "";
+                        if (role.RoleID.Equals(Model.SelectedRoleId))
+                        {
+                            active = "selected";
+                        }
+                        <option @active value="@role.RoleID">@role.RoleName</option>
+                    }
+                </select>
+            }
+            <div style="height: 50px;"></div>
+        </div>
+    </div>
+</div>
+
+<div class="col-12 tm-block-col">
+    @*<div class="tm-bg-primary-dark tm-block tm-block-taller tm-block-scroll">*@
+    <div class="tm-bg-primary-dark">
+        @*Bỏ scroll đi*@
+
+        <h4 class="tm-block-title">User Account List</h4>
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th scope="col">No.</th>
+                    <th scope="col">Username</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Avatar</th>
+                    <th scope="col">Full mame</th>
+                    <th scope="col">Date Create</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{int count = 0;}
+                @foreach (var user in Model.Users)
+                {
+                    <tr style="cursor: pointer;" onclick="document.getElementById('@user.Username' + 'forSubmit').submit();">
+                        <td>@(++count)</td>
+                        <td>@user.Username</td>
+                        <td>@user.Email</td>
+                        <td><img src="@Url.Action("GetImageUser", "User", new { user.Username })" width="32" height="32" alt="avatar" /></td>
+                        <td>@user.FullName</td>
+                        <td>@user.DateCreated.ToShortDateString()</td>
+                        <td style="display:none">
+                            @using (Html.BeginForm("EditProfileUser", "Admin", FormMethod.Get, new { id = user.Username + "forSubmit" }))
+                            {
+                                @Html.Hidden("username", user.Username);
+                                @Html.Hidden("returnUrl", Request.Url.PathAndQuery)
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <div style="clear:both">
+        @Html.PageLinks2(Model.PagingInfo, "btn-primary", "btn btn-default",
+                      x => Url.Action("ManageUser", "Admin", new { roleId = Model.SelectedRoleId, page = x }))
+    </div><br /><br />
+    @using (Html.BeginForm("CreateUser", "Admin", FormMethod.Get))
+    {
+        <input type="hidden" name="returnUrl" value="@Request.Url.PathAndQuery">
+        <input type="submit" value="Create User" class="genric-btn warning btn-block text-uppercase" style="font-size: 20px;" />
+    }
+</div>
+
+@*<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="js/jquery-3.3.1.min.js"></script>
+    <!-- https://jquery.com/download/ -->
+    <script src="js/moment.min.js"></script>
+    <!-- https://momentjs.com/ -->
+    <script src="js/Chart.min.js"></script>
+    <!-- http://www.chartjs.org/docs/latest/ -->
+    <script src="js/bootstrap.min.js"></script>
+    <!-- https://getbootstrap.com/ -->
+    <script src="js/tooplate-scripts.js"></script>
+    <script src="assets/js/vendor/jquery.datetimepicker.full.min.js"></script>
+    <script src="assets/js/vendor/jquery.nice-select.min.js"></script>*@

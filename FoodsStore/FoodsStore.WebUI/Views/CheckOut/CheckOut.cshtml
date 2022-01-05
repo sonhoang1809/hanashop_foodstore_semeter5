@@ -1,0 +1,55 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Check Out</title>
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="~/assets/images/logo/favicon.png" type="image/x-icon">
+    <link rel="stylesheet" href="~/assets/style/style-payment.css">
+    <link rel="stylesheet" href="~/assets/style/pop-up-message-out-of-stock.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+</head>
+<body>
+
+    <div class="body-text"><h2>ENTER RECEIVED USER INFORMATION</h2></div>
+    <form action="/Cart/LoadCartDetails" method="POST">
+        <input type="hidden" name="returnUrl" value="@Request["returnUrl"]" />
+        <input type="hidden" name="IDBill" value="@Request["IDBill"]">
+        <h3><a href="#" onclick="$(this).closest('form').submit();">< Back to Check Shopping Cart</a></h3>
+    </form>
+    <br>
+    <form action="/CheckOut/PaymentMethod" method="POST">
+        <div class="form-container">
+            <div class="personal-information">
+                <h1>Payment Information</h1>
+            </div> <!-- end of personal-information -->
+            <input type="hidden" name="returnUrl" value="@Request["returnUrl"]" />
+            <input id="input-field" type="text" name="fullname" required placeholder="Full Name" value="@Request["fullname"]" />
+            <input id="input-field" type="text" name="address" required autocomplete="on" maxlength="45" placeholder="Address" value="@Request["address"]" />
+            <input id="input-field" type="text" name="street" required autocomplete="on" maxlength="20" placeholder="Street" value="@Request["street"]" />
+            <input id="input-field" type="text" name="city" required autocomplete="on" placeholder="City" value="@Request["city"]" />
+
+            <input type="hidden" name="IDBill" value="@Request["IDBill"]">
+            <input id="input-button" type="submit" value="Continue to Method Payment" />
+        </div>
+    </form>
+    <div class="message-popup" role="alert">
+        <div class="message-popup-container">
+            <p class="message-display">Wait us a second to send received user information !</p>
+            <a href="#0" class="message-buttons" style="color: #000; font-size: 20px;">OK</a>
+            <a href="#0" class="message-popup-close img-replace">Close</a>
+        </div> <!-- message-popup-container -->
+    </div> <!-- message-popup -->
+    
+    <script src="~/assets/product-js/shopping-cart.js"></script>
+    <script src="~/assets/product-js/pop-up-delete-food-in-cart.js"></script>
+    <script src="~/assets/product-js/pop-up-message-out-of-stock.js"></script>
+
+
+</body>
+</html>

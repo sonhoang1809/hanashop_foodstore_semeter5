@@ -1,0 +1,198 @@
+﻿@model FoodsStore.Domain.Entities.Product
+
+@{
+    ViewBag.Title = "Edit Product";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewBag.SelectedView = "ManageProduct";
+}
+
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>Food Details Page</title>
+        <!-- Favicon -->
+        <link rel="shortcut icon" href="~/assets/images/logo/favicon.png" type="image/x-icon">
+
+        <link rel="stylesheet" href="~/assets/style/pop-up-message-out-of-stock.css" />
+        <link rel="stylesheet" href="~/assets/style/pop-up-confirm.css" />
+        <link rel="stylesheet" href="~/assets/css/nice-select.css" type="text/css">
+
+        <link rel="stylesheet" href="~/assets/style/upload-pic-food.css" type="text/css">
+
+        <link rel="stylesheet" href="~/assets/style/style-validation.css" type="text/css" />
+        <link rel="stylesheet" href="~/assets/style/templatemo-style.css">
+    </head>
+
+<!-- Food Details Admin Starts -->
+
+@Html.Partial("~/Views/Admin/_NavbarPartialView.cshtml")
+
+<div class="container tm-mt-big tm-mb-big">
+    <div class="row">
+        <div class="col-xl-9 col-lg-10 col-md-12 col-sm-12 mx-auto">
+            <div class="tm-bg-primary-dark tm-block tm-block-h-auto">
+                <div class="row">
+                    <div class="col-12">
+                        <h2 class="tm-block-title d-inline-block">Food Details</h2>
+                    </div>
+                </div>
+
+                @using (Html.BeginForm("SaveProduct", "Admin", FormMethod.Post, new { enctype = "multipart/form-data" })) {
+                    <input type="hidden" name="returnUrl" value="@(ViewBag.returnUrl)">
+                    <input type="hidden" name="ProductID" value="@Model.ProductID">
+                    <div class="row tm-edit-product-row">
+                        <div class="col-xl-6 col-lg-6 col-md-12">
+                            <div class="tm-edit-product-form">
+                                <div class="form-group mb-3">
+                                    <label for="name">Food Name</label>
+                                    @*<input id="name" name="ProductName" type="text" class="form-control validate"
+                                           value="@Model.ProductName" />*@
+                                    @Html.TextBoxFor(p => p.ProductName, new { id="name", @class="form-control validate" })
+                                </div>
+                                @Html.ValidationMessageFor(p => p.ProductName)
+                                <div class="form-group mb-3" style="margin-top: 10px;">
+                                    <label for="description">Description</label>
+                                    @*<textarea name="Description" class="form-control validate" rows="3">@Model.Description</textarea>*@
+                                    @Html.TextAreaFor(p => p.Description, new { @class="form-control validate", rows="3", value=Model.Description })
+                                </div>
+                                @Html.ValidationMessageFor(p => p.Description)
+                                <div class="form-group mb-3">
+                                    <label for="category">Category</label>
+                                    <select class="custom-select tm-select-accounts" id="category" name="CategoryID" required>
+                                        @foreach (var item in (IEnumerable<FoodsStore.Domain.Entities.Category>)ViewData["CATEGORIES"]) {
+                                            string active = "";
+                                            if (Model.CategoryID == item.CategoryID) {
+                                                active = "selected";
+                                            }
+                                            <option @active value="@item.CategoryID">
+                                                @item.CategoryName
+                                            </option>
+                                        }
+                                    </select>
+                                </div>
+                                @Html.ValidationMessageFor(p => p.CategoryID)
+                                <div class="form-group mb-3" style="margin-top: 10px;">
+                                    <label for="Status" style="margin-top: 30px;">Status</label>
+                                    <select class="custom-select tm-select-accounts" id="category" name="StatusCode" required>
+                                        @foreach (var item in (IEnumerable<FoodsStore.Domain.Entities.ProductStatus>)ViewData["PRODUCTSTATUSES"]) {
+                                            string active = "";
+                                            if (Model.StatusCode == item.StatusCode) {
+                                                active = "selected";
+                                            }
+                                            <option @active value="@item.StatusCode">
+                                                @item.Status
+                                            </option>
+                                        }
+
+                                    </select>
+                                </div>
+                                @Html.ValidationMessageFor(p => p.StatusCode)
+
+                                <div class="row">
+                                    <div class="form-group mb-3 col-xs-12 col-sm-6" style="margin-top: 30px;">
+                                        <label for="Price Unit ($)">Price Unit ($)</label>
+                                        @Html.TextBoxFor(p => p.Price, new { id="stock", type="number", min="0.1", step="0.1", @class="form-control validate", value=Model.Price})
+                                        @Html.ValidationMessageFor(p => p.Price)
+                                    </div>
+                                    
+                                    <div class="form-group mb-3 col-xs-12 col-sm-6" style="margin-top: 30px;">
+                                        <label for="Quantity">Quantity In Stock </label>
+                                        @Html.TextBoxFor(p => p.Quantity, new { id="stock", type="number", @class = "form-control validate", value=Model.Quantity })
+                                        @Html.ValidationMessageFor(p => p.Quantity)
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-6 col-lg-6 col-md-12 mx-auto mb-4">
+                            <div class="uploadWrapper">
+                                <div id="imageUploadForm" class="imageUploadForm">
+                                    <span class="helpText" id="helpText">Upload an image</span>
+                                    <img style="height: 350px; width: 320px;" src="@Url.Action("GetImageProduct", "Product", new { Model.ProductID })">
+                                    <input type="file" id="fileUpdate"
+                                           class="uploadButton" name="imageProduct"
+                                           accept="image/*">
+                                    <div id="uploadedImg" class="uploadedImg">
+                                        <span class="unveil"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row" style="margin-top: 10px;">
+                                <div class="form-group mb-3 col-xs-12 col-sm-6">
+                                    <label for="Create Date">Create Date</label>
+                                    <input id="stock" name="DateCreated" type="text" class="form-control validate" disabled style="background-color: #54657d;"
+                                           required value="@Model.DateCreated.ToShortDateString()" />
+                                </div>
+                                <div class="form-group mb-3 col-xs-12 col-sm-6">
+                                    <label for="Update Date">Last Modified</label>
+                                    <input id="stock" type="text" class="form-control validate" disabled style="background-color: #54657d;"
+                                           required value="@Model.DateModified" />
+                                </div>
+                                <div class="form-group mb-3 col-xs-12 col-sm-6">
+                                    <label for="Update User">User Modified</label>
+                                    <input id="stock" name="UserModified" type="text" class="form-control validate" disabled style="background-color: #54657d;"
+                                           value="@Model.UserModified" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            @*<div class="cd-popup" role="alert">
+                        <div class="cd-popup-container">
+                            <p>Are you sure you want to update this food ?</p>
+                            <ul class="cd-buttons">
+                                <li><a href="#0" onclick="$(this).closest('form').submit();">Yes</a></li>
+                                <li><a href="#0" class="cd-no">No</a></li>
+                            </ul>
+                            <a href="#0" class="cd-popup-close img-replace">Close</a>
+                        </div> <!-- cd-popup-container -->
+                    </div> <!-- cd-popup -->*@
+
+                            <input type="submit" style="font-size: 20px;" class="genric-btn success-border btn-block text-uppercase" value="@(Model.ProductID == 0 ? "Create" : "Update")" />
+                            <br />
+                            <br />
+                            <a class="btn btn-secondary" style="color:white" href="@ViewBag.returnUrl">Back</a>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Food Details Admin End -->
+
+<div class="message-popup" role="alert">
+    <div class="message-popup-container">
+        @{
+            if (ViewBag.StatusUpdate != null) {
+                <p class="message-display">@ViewBag.StatusUpdate</p>
+            }
+        }
+   
+        <a href="#0" class="message-buttons" style="color: #000; font-size: 25px;">OK</a>
+        <a href="#0" class="message-popup-close img-replace">Close</a>
+    </div> <!-- message-popup-container -->
+</div> <!-- message-popup -->
+
+@{ 
+    if (ViewBag.StatusUpdate != null) {
+        <script>
+            $(".message-popup").addClass("is-visible");
+        </script>
+    }
+}
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="~/assets/product-js/update-food.js"></script>
+<script src="~/assets/product-js/food-details.js"></script>
+<script src="~/assets/product-js/pop-up-confirm.js"></script>
+<script src="~/assets/product-js/pop-up-message-out-of-stock.js"></script>
+
+<script>
+    jQuery(document).ready(function ($) {
+        $('#update-food*').click(function () {
+            event.preventDefault();
+            $(this).parent().children(".cd-popup").addClass("is-visible");
+        });
+    });
+</script>

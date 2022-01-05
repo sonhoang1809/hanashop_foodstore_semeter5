@@ -1,0 +1,221 @@
+﻿@using FoodsStore.WebUI.Models;
+@{
+    Layout = null;
+}
+@model FoodsStore.WebUI.Models.CartDetailsModel
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Shopping Cart</title>
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="~/assets/images/logo/favicon.png" type="image/x-icon">
+    <link rel="stylesheet" href="~/assets/style/style-shopping-cart2.css" />
+    <link rel="stylesheet" href="~/assets/style/pop-up-confirm.css" />
+    <link rel="stylesheet" href="~/assets/style/pop-up-message-out-of-stock.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+</head> 
+<body>
+    <header id="site-header">
+        <div class="container">
+            <h1>Shopping cart <span>[</span><em>@Html.Action("GetFullNameUser", "Account", new { username = HttpContext.Current.User.Identity.Name })</em><span>]</span></h1>
+            @using (Html.BeginForm("ContinueShopping", "Product", FormMethod.Get))
+            {
+                <input type="hidden" name="returnUrl" value="@TempData["returnUrl"]" />
+                <a href="#" class="btn" onclick="$(this).closest('form').submit();">Continue Shopping</a>
+            }
+        </div>
+    </header>
+    <div class="container">
+        <section id="cart">
+            @{if (Model == null || Model.ProductsInCart == null || Model.ProductsInCart.Count() == 0)
+                {
+                    <h1>You have no products!</h1>
+                }
+                else
+                {
+                    foreach (var x in Model.ProductsInCart)
+                    {
+                        <article class="product" id="@x.ProductID">
+                            <header>
+                                <form action="/Product/Details" method="POST">
+                                    <input type="hidden" name="productId" value="@x.ProductID">
+                                    <a class="view-details-food" onclick="$(this).closest('form').submit();">
+                                        <img src="/Product/GetImageProduct?productId=@x.ProductID" alt="">
+                                        <h3>View details</h3>
+                                    </a>
+                                </form>
+                            </header>
+                            <div class="content">
+                                <h2 id="prodName-@x.ProductID">@x.ProductName</h2>
+                                @x.ShortDescription
+                            </div>
+                            <footer class="content">
+                                <input type="hidden" id="idProdHere" value="@x.ProductID" />
+                                <input type="hidden" id="idBillHere" value="@Model.BillID" />
+                                <span class="qt-minus">-</span>
+                                <span class="qt" id="qua-@x.ProductID">@x.Quantity</span>
+                                <span class="qt-plus">+</span>
+                                <span class="qt-remove" onclick="displayPopUpDelete(@Model.BillID,@x.ProductID);">x</span>
+
+                                @{
+                                    if (@x.StatusCode.Equals("OUTS"))
+                                    {
+                                        <span class="qt-status">Out of Stock</span>
+                                    }
+                                    if (@x.StatusCode.Equals("STOP"))
+                                    {
+                                        <span class="qt-status">Stop selling</span>
+                                    }
+                                }
+                                <span class="qt-update" onclick="updateProductInCart(@Model.BillID,@x.ProductID);">Update</span>
+                                <h5 class="full-price">@x.Total$</h5>
+                                <h5 class="price">@x.Price$</h5>
+                            </footer>
+                        </article>
+                    }
+                }
+            }
+        </section>
+    </div>
+    <footer id="site-footer">
+        <div class="container clearfix">
+            <div class="left">
+                @{
+                    if (Model != null)
+                    {
+                        if (Model.ProductsInCart != null)
+                        {
+                            if (Model.ProductsInCart.Count() > 0)
+                            {
+                                <h2 class="subtotal">Subtotal: <span>@Model.SubTotal</span>$</h2>
+                                <h2 class="tax">Taxes (10%): <span>@Model.Tax</span>$</h2>
+                                <h2>Last time change:@Model.LastTimeChange</h2>
+                            }
+                            else
+                            {
+                                <h2 class="subtotal">Subtotal: <span>0</span>$</h2>
+                                <h2 class="tax">Taxes (10%): <span>0</span>$</h2>
+                                <h2>Last time change: </h2>
+                            }
+                        }
+                        else
+                        {
+                            <h2 class="subtotal">Subtotal: <span>0</span>$</h2>
+                            <h2 class="tax">Taxes (10%): <span>0</span>$</h2>
+                            <h2>Last time change: </h2>
+                        }
+                    }
+                    else
+                    {
+                        <h2 class="subtotal">Subtotal: <span>0</span>$</h2>
+                        <h2 class="tax">Taxes (10%): <span>0</span>$</h2>
+                        <h2>Last time change: </h2>
+                    }
+                }
+            </div>
+            <div class="right">
+
+                @{
+                    if (Model != null)
+                    {
+                        if (Model.ProductsInCart != null && Model.ProductsInCart.Count() > 0)
+                        {
+                            <h1 class="total">Total: <span>@Model.Total</span>$</h1>
+                        }
+                        else
+                        {
+                            <h1 class="total">Total: <span>0</span>$</h1>
+                        }
+                    }
+                    else
+                    {
+                        <h1 class="total">Total: <span>0</span>$</h1>
+                    }
+                }
+                @{
+                    if (Model != null)
+                    {
+                        if (Model.ProductsInCart != null && Model.ProductsInCart.Count() > 0)
+                        {
+                                <form action="/CheckOut/Index" method="post">
+                                    <input type="hidden" name="IDBill" value="@Model.BillID">
+                                    <input type="hidden" name="returnUrl" value="@TempData["returnUrl"]" />
+                                    <a class="btn" onclick="goToCheckOut(@Model.BillID,this);">Checkout</a>
+                                </form>
+                        }
+                    }
+                }
+            </div>
+        </div>
+    </footer>
+    <div class="message-popup" role="alert">
+        <div class="message-popup-container">
+            @{
+
+                if (TempData["ChangePrice"] != null)
+                {
+                    <p class="message-display">@TempData["ChangePrice"]</p>
+                }
+                if (TempData["ErrorOrder"] != null)
+                {
+                    <p class="message-display">@TempData["ErrorOrder"]</p>
+                }
+                if (ViewBag.CartNull != null)
+                {
+                    <p class="message-display">@ViewBag.CartNull</p>
+                }
+            }
+            <a href="#0" class="message-buttons" style="color: #000; font-size: 20px;">OK</a>
+            <a href="#0" class="message-popup-close img-replace">Close</a>
+        </div> <!-- message-popup-container -->
+    </div> <!-- message-popup -->
+    <div class="cd-popup" role="alert">
+        <div class="cd-popup-container">
+            <p class="message-display">Are you sure you want to remove this product from your cart?</p>
+            <ul class="cd-buttons">
+                <li style="display: none;">
+                    <input type="hidden" name="productID" id="prodID" value="">
+                </li>
+                <li style="display: none;">
+                    <input type="hidden" name="idBill" id="idBill" value="">
+                </li>
+                <li><a href="#0" class="cd-yes" style="background-color: crimson;" onclick="removeProduct();">Yes</a></li>
+                <li><a href="#0" class="cd-no">No</a></li>
+            </ul>
+            <a href="#0" class="cd-popup-close img-replace">Close</a>
+        </div> <!-- cd-popup-container -->
+    </div> <!-- cd-popup -->
+    <script>
+        function displayPopUpDelete(BillID, ProductID) {
+            var prodName = $('#prodName-' + ProductID).html();
+            $('.cd-popup').addClass('is-visible');
+            $('#prodID').val(ProductID);
+            $('#idBill').val(BillID);
+            var insideMes = '<p class="message-display">Are you sure you want to remove product ' + prodName + ' from your cart?</p >';
+            $('.cd-popup-container').children('p').replaceWith(insideMes);
+            var li2 = '<li><a href="#0" class="cd-yes" style="background-color: crimson;"' +
+                'onclick="removeProduct();">Yes</a></li> ';
+            var li3 = '<li><a href="#0" class="cd-no">No</a></li>';
+            $('.cd-buttons li:eq(2)').replaceWith(li2);
+            $('.cd-buttons li:eq(3)').replaceWith(li3);
+        }
+    </script>
+    @{
+       
+        if (ViewBag.CartNull != null || TempData["ErrorOrder"] != null)
+        {
+            <script>
+                $(".message-popup").addClass("is-visible");
+
+            </script>
+        }
+        
+    }
+
+
+    <script src="~/assets/product-js/shopping-cart.js"></script>
+    <script src="~/assets/product-js/pop-up-delete-food-in-cart.js"></script>
+    <script src="~/assets/product-js/pop-up-message-out-of-stock.js"></script>
+</body>
+</html>

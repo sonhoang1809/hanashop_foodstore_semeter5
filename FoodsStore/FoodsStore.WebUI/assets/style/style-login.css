@@ -1,0 +1,213 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : Jan 31, 2020, 10:37:32 PM
+    Author     : sonho
+*/
+
+
+/*Login-form*/
+
+
+
+.login-form {
+    margin-top: 10px;
+    width: 360px;
+    background: #f1f1f1;
+    height: auto;
+    padding: 30px 40px;
+    border-radius: 20px;
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    z-index: 99;
+    transform: translate(-50%, -50%);
+    box-shadow: 6px 6px 29px -4px rgba(0,0,0,0.75);
+    transition: 0.5s;
+
+}
+
+.login-form h1 {
+    text-align: center;
+    font-size: 45px;
+    margin-bottom: 60px;
+    color: #6E6D69;
+}
+
+.login-form .txtb {
+    border-bottom: 2px solid #adadad;
+    position: relative;
+    margin: 30px 0;
+}
+
+.login-form .txtb input {
+    font-size: 15px;
+    color: #333;
+    border: none;
+    width: 100%;
+    outline: none;
+    background: none;
+    padding: 0 5px;
+    height: 40px;
+}
+
+.login-form .txtb span::before {
+    content: attr(data-placeholder);
+    position: absolute;
+    top: -10%;
+    left: 5px;
+    color: #adadad;
+    font-size: 17px;
+    transform: translateY(-50%);
+    z-index: -1;
+    transition: .5s;
+}
+
+.login-form .txtb span::after {
+    content: '';
+    position: absolute;
+    width: 0%;
+    height: 2.2px;
+    background: #8AD144;
+    transition: .5s;
+    margin-top: 39.5px;
+    margin-left: -280px;
+}
+
+.login-form .focus+span::before {
+    top: -4px;
+}
+
+.login-form .focus+span::after {
+    width: 100%;
+}
+
+.login-form .btnForgot {
+    float: right;
+    margin-bottom: 10px;
+    font-size: 15px;
+}
+
+
+
+.login-form .bottom-text {
+    margin-top: 40px;
+    text-align: center;
+    font-size: 15px;
+}
+
+.login-form .middle {
+    top: 50%;
+    width: 100%;
+    text-align: center;
+    margin-top: 10px;
+}
+
+.login-form .middle p {
+    font-size: 15px;
+}
+
+.login-form .btnLoginBy {
+    display: inline-block;
+    width: 50px;
+    height: 50px;
+    background: #f1f1f1;
+    margin: 5px;
+    border-radius: 30%;
+    box-shadow: 0 5px 15px -5px #000070;
+    color: #3498db;
+    overflow: hidden;
+    position: relative;
+    padding-top: 21px; 
+}
+
+
+.login-form .btnLoginBy i{
+    line-height: 5px;
+    font-size: 25px;
+    color: #3498db;
+    transition: 0.2s linear;
+}
+
+.login-form .btnLoginBy:hover i{
+    transform: scale(1.1);
+    color: #fff;
+}
+
+.login-form .btnLoginBy::before {
+    content: '';
+    position: absolute;
+    width: 120%;
+    height: 120%;
+    background: #3498db;
+    transform: rotate(45deg);
+    left: -110%;
+    top: 90%;
+
+}
+
+
+.login-form .btnLoginBy:hover::before {
+    color: #fff;
+    animation: aaa 0.7s 1;
+    top: -10%;
+    left: -10%;
+}
+
+.login-form .animate{
+    animation: zoom 0.6s;
+}
+.close-form{
+    float: right;
+    font-size: 20px;
+    border: solid 1.8px;
+    border-radius: 20%;
+    background: #f1f1f1;
+    color: #6E6D69;
+}
+
+.close-form:hover {
+    background-color: #8AD144;
+    color: #f1f1f1;
+}
+
+@keyframes aaa{
+    0% {
+        left: -110%;
+        top: 90%;
+
+    }
+    50% {
+        left: 10%;
+        top: -30%;
+
+    }
+    100% {
+        left: -10%;
+        top: -10%;
+    }
+}
+@keyframes zoom{
+    from{transform: scale(0)}
+    to{transform: scale(1)}
+}
+
+@media (max-width: 450px){
+    .login-form{
+        width: 90%;
+    }
+    .login-form .txtb span::after{
+        margin-top: 39.5px;
+        margin-left: -244px;
+    }
+    .login-form .btnLoginBy {
+        margin: 2px;
+
+    }
+    .login-form .btnLoginBy{
+        font-size: 18px;
+    }
+}

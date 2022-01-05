@@ -1,0 +1,227 @@
+
+.sp-cart {
+    height: 600px;
+    background: #eee;
+    overflow: auto;
+}
+
+.sp-cart .clearfix {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.main-menu ul li:hover ul.sp-cart {
+    filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=100);
+    opacity: 1;
+    visibility: visible;
+    top: 100%;
+}
+
+.main-menu ul li ul.sp-cart {
+    padding: 10px;
+    filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
+    opacity: 0;
+    visibility: hidden;
+    position: absolute;
+    top: 130%;
+    left: -1000px;
+    width: 1000px;
+    background: #f9f9ff;
+    z-index: 2;
+    -webkit-transition: .5s;
+    -moz-transition: .5s;
+    -o-transition: .5s;
+    transition: .5s;
+}
+
+
+.sp-cart .container {
+    font-family: 'Open Sans', sans-serif;
+    margin: 0 auto;
+    width: 900px;
+}
+
+.sp-cart #cart {
+    width: 100%;
+}
+
+.sp-cart #cart h1 {
+    font-weight: 300;
+}
+
+.sp-cart #cart a {
+    color: #53b5aa;
+    text-decoration: none;
+    -webkit-transition: color .2s linear;
+    -moz-transition: color .2s linear;
+    -ms-transition: color .2s linear;
+    -o-transition: color .2s linear;
+    transition: color .2s linear;
+}
+
+.sp-cart #cart a:hover {
+    color: #000;
+}
+
+.sp-cart .product.removed {
+    margin-left: 980px !important;
+    opacity: 0;
+}
+
+.sp-cart .product {
+    border: 1px solid #eee;
+    margin: 15px 0;
+    width: 100%;
+    height: 110px;
+    position: relative;
+
+    -webkit-transition: margin .2s linear, opacity .2s linear;
+    -moz-transition: margin .2s linear, opacity .2s linear;
+    -ms-transition: margin .2s linear, opacity .2s linear;
+    -o-transition: margin .2s linear, opacity .2s linear;
+    transition: margin .2s linear, opacity .2s linear;
+}
+
+.sp-cart .product img {
+    width: 100%;
+    height: 100%;
+}
+
+.sp-cart .product header,
+.product .content {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-style: none none solid none;
+    float: left;
+}
+
+.sp-cart .product header {
+    background: #000;
+    margin: 0;
+    overflow: hidden;
+    padding: 0;
+    position: relative;
+    width: 12%;
+    height: 102%;
+    border-right: 1px solid;
+}
+
+
+.product .content {
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    height: 73px;
+    padding: 0 20px;
+    margin-left: 2%;
+    width: 86%;
+}
+
+.product h3 {
+    color: #53b5aa;
+    font-size: 25px;
+    font-weight: 300;
+    margin: 17px 0 20px 0;
+}
+
+.sp-cart .product footer.content {
+    height: 34px;
+    margin: 3px 0 0 2%;
+    padding: 0;
+}
+
+.sp-cart .product footer .price {
+    background: #fcfcfc;
+    color: #000;
+    float: right;
+    font-size: 13px;
+    font-weight: 300;
+    line-height: 33px;
+    margin: 0;
+    padding: 0 20px;
+}
+
+.sp-cart .product footer .full-price {
+    background: #53b5aa;
+    color: #fff;
+    float: right;
+    font-size: 17px;
+    font-weight: 300;
+    line-height: 33px;
+    margin: 0;
+    padding: 0 20px;
+}
+
+.sp-cart .qt {
+    display: block;
+    float: left;
+}
+
+.sp-cart .qt {
+    margin-left: 20px;
+    margin-right: 20px;
+    font-size: 15px;
+    line-height: 35px;
+    width: auto;
+    text-align: left;
+}
+
+
+
+.sp-cart #site-footer {
+    margin: 30px 0 0 0;
+}
+
+.sp-cart #site-footer {
+    padding: 40px;
+}
+
+    .sp-cart #site-footer h3 {
+        background: #fcfcfc;
+        border: 1px solid #ccc;
+        border-style: none none solid none;
+        font-size: 24px;
+        font-weight: 300;
+        margin: 0 0 7px 0;
+        padding: 14px 40px;
+        text-align: center;
+    }
+
+#site-footer h4 {
+    font-size: 24px;
+    font-weight: 300;
+    margin: 10px 0 0 0;
+}
+
+#site-footer h5 {
+    font-size: 19px;
+    font-weight: 300;
+    margin: 15px 0;
+}
+
+.sp-cart .left {
+    float: left;
+}
+
+.sp-cart .right {
+    float: right;
+}
+
+.btn-sp-cart {
+    background: #53b5aa;
+    border: 1px solid #999;
+    border-style: none none solid none;
+    cursor: pointer;
+    display: block;
+    color: #fff;
+    font-size: 20px;
+    font-weight: 300;
+    padding: 16px 0;
+    width: 290px;
+    text-align: center;
+}
+
+.btn-sp-cart:hover {
+    color: #fff;
+    background: #429188;
+}

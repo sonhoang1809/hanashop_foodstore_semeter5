@@ -1,0 +1,318 @@
+﻿
+<head>
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="~/assets/css/animate-3.7.0.css">
+    <link rel="stylesheet" href="~/assets/css/font-awesome-4.7.0.min.css">
+    <link rel="stylesheet" href="~/assets/css/bootstrap-4.1.3.min.css">
+    <link rel="stylesheet" href="~/assets/css/owl-carousel.min.css">
+    <link rel="stylesheet" href="~/assets/css/jquery.datetimepicker.min.css">
+    <link rel="stylesheet" href="~/assets/css/style.css">
+    <script src="https://use.fontawesome.com/releases/v5.11.2/js/all.js" data-auto-replace-svg="nest"></script>
+    <link rel="stylesheet" href="~/assets/style/style-login.css" type="text/css">
+    <link rel="stylesheet" href="~/assets/style/style-signup.css" type="text/css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <!--facebook api
+    <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v6.0&appId=549108322381097&autoLogAppEvents=1"></script>
+        -->
+    <!--google api-->
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <meta name="google-signin-scope" content="profile email">
+    <meta name="google-signin-client_id"
+          content="789899753420-2ln03a1h14fmuk7kg23t2tiviq3b01om.apps.googleusercontent.com">
+</head>
+
+
+<!-- Preloader Starts -->
+<div class="preloader">
+    <div class="spinner"></div>
+</div>
+<!-- Preloader End -->
+<!-- Header Area Starts -->
+<header class="header-area">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-2">
+                <div class="logo-area">
+                    <a href="@Url.Action("Index", "Product")"><img src="~/assets/images/logo/logo.png" alt="logo"></a>
+                </div>
+            </div>
+            <div class="col-lg-10">
+                <div class="custom-navbar">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                <div class="main-menu">
+                    <ul>
+
+                        <li>
+                            @Html.ActionLink("Home", "Index", "Product")
+                        </li>
+                        @if (!User.Identity.IsAuthenticated)
+                        {
+                            <li>
+                                <a class="login-dp" onclick="displayLogin()" href="#0">Login</a>
+                                <ul class="sub-menu">
+                                    <li>
+                                        @*<a onclick="displaySignup()" href="#0">Sign up</a>*@
+                                        @Html.ActionLink("Sign Up", "SignUp", "Account", new { returnUrl = Request.Url.PathAndQuery }, null)
+                                    </li>
+                                </ul>
+                            </li>
+                        }
+
+                        @if (User.Identity.IsAuthenticated)
+                        {
+
+                            if (HttpContext.Current.User.IsInRole("Admin"))
+                            {
+                                <li>
+                                    <a href="@Url.Action("ManageProduct","Admin")">Manage</a>
+                                    <ul class="sub-menu">
+                                        <li>
+
+                                            <a href="@Url.Action("CreateProduct","Admin", new { returnUrl = Request.Url.PathAndQuery })">Add A New Food</a>
+                                        </li>
+                                        <li>
+
+
+                                            @Html.ActionLink("Manage Hana Shop", "Dashboard", "Admin")
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <a href="#0">Welcome admin <span style="color:brown">@Html.Action("GetFullNameUser", "Account", new { username = HttpContext.Current.User.Identity.Name })</span></a>
+                                    <ul class="sub-menu">
+                                        <li>
+                                            @Html.ActionLink("Edit Profile", "EditProfile", "User", new { username = HttpContext.Current.User.Identity.Name, returnUrl = Request.Url.PathAndQuery }, null)
+                                        </li>
+                                        <li>
+
+                                            @Html.ActionLink("Log out", "Logout", "Account")
+                                        </li>
+                                    </ul>
+                                </li>
+                            }
+                            if (HttpContext.Current.User.IsInRole("user"))
+                            {
+                                <li>
+                                    <a href="#0">Welcome <span style="color:brown">@Html.Action("GetFullNameUser", "Account", new { username = HttpContext.Current.User.Identity.Name })</span></a>
+                                    <ul class="sub-menu">
+                                        <li>
+                                            <form action="/Cart/LoadCartDetails" method="POST">
+                                                <input type="hidden" name="returnUrl" value=""/>
+                                                <a href="#0" onclick="setReturnUrlLoadCart(); $(this).closest('form').submit();">Check Your Cart</a>
+                                            </form>
+                                        </li>
+                                        <li>
+                                            @Html.ActionLink("Edit Profile", "EditProfile", "User", new { username = HttpContext.Current.User.Identity.Name, returnUrl = Request.Url.PathAndQuery }, null)
+                                        </li>
+                                        <li>
+                                            <a href="/Account/Logout" onclick="fbLogout(); GglogOut();">Log out</a>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    @Html.Partial("~/Views/Cart/_shoppingCartHoverPartialView.cshtml")
+                                </li>
+                            }
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+<!-- Header Area End -->
+<!--login form-->
+
+<div id="login-form" class="login-form" style="display: none;">
+    <button class="close-form" onclick="closeLogin()">x</button> <br>
+    @using (Html.BeginForm("Login", "Account", FormMethod.Post))
+    {
+        <input type="hidden" name="returnUrl" value="@(ViewBag.returnUrl ?? Request.Url.PathAndQuery)" />
+        <h1>Login</h1>
+        <div class="txtb">
+            <input type="text" name="username" required="" onkeypress="return AvoidSpace(event)" value="">
+            <span data-placeholder="Username"></span>
+        </div>
+        <div class="txtb">
+            <input type="password" name="password" required="" value="">
+            <span data-placeholder="Password"></span>
+        </div>
+        <input type="submit" class="genric-btn warning-border radius" name="action" value="Login" style="width: 100%; font-size: 20px;" />
+        <div class="middle">
+            <p> Or Login With </p>
+            <div class="fb-login-button" scope="public_profile,email" onlogin="fbLogin();" data-width="" data-size="large" data-button-type="login_with" data-layout="default" data-auto-logout-link="false" data-use-continue-as="true"></div>
+
+            <div style="height: 10px;">
+            </div>
+            <div class="g-signin2" data-width="280%" data-height="50%" data-longtitle="true" data-onsuccess="onSignIn"></div>
+        </div>
+
+        <div class="bottom-text">
+            Don't have account ?
+            @Html.ActionLink("Sign Up", "SignUp", "Account", new { returnUrl = Request.Url.PathAndQuery }, null)
+            <br>
+            <br>
+        </div>
+    }
+</div>
+<!--End Login form-->
+<!--Signup form-->
+<div id="signup-form" class="signup-form" style="display: none;">
+    <button class="close-form" onclick="closeSignup()">x</button> <br>
+    <form action="SendCodeUserController" method="POST">
+        <h1>Sign Up</h1>
+        <div class="txtb">
+            <input type="text" name="userID" required="" pattern="[A-Za-z]{3,}" title="Input UserID that can contain three letters or more (no numbers or special characters)" onkeydown="return AvoidSpace(event)" value="@Request["userID"]}">
+            <span data-placeholder="User ID"></span>
+        </div>
+        <div class="txtb">
+            <input type="email" name="email" required="" value="@Request["email"]">
+            <span data-placeholder="Email"></span>
+        </div>
+        <div class="txtb">
+            <input type="text" name="userName" required="" value="@Request["userName"]">
+            <span data-placeholder="User Name"></span>
+        </div>
+        <div class="txtb">
+
+            <input type="password" name="password" required="" value="@Request["password"]">
+            <span data-placeholder="Password"></span>
+        </div>
+        <div class="txtb">
+            <input type="password" name="confirm" required="" value="@Request["confirm"]">
+            <span data-placeholder="Confirm Password"></span>
+        </div>
+        <input type="submit" class="genric-btn warning-border radius" name="action" value="Sign up" style="width: 100%; font-size: 20px;">
+    </form>
+    <div class="bottom-text">
+        Already have account ?
+        <a onclick="fromSignupToLogin()" href="#">Login</a>
+        <br>
+        <br>
+    </div>
+</div>
+<!--End Signup form-->
+<!-- Javascript Facebook-->
+
+<script>
+    function setReturnUrlLoadCart() {
+        var returnUrl = getReturnUrl();
+        $("input[name=returnUrl]*").val(returnUrl);
+        
+    }
+    window.fbAsyncInit = function () {
+        // FB JavaScript SDK configuration and setup
+        FB.init({
+            appId: '549108322381097', // FB App ID
+            cookie: true,  // enable cookies to allow the server to access the session
+            xfbml: true,  // parse social plugins on this page
+            version: 'v6.0' // use graph api version 6.0
+        });
+    };
+    // Facebook login with JavaScript SDK
+    function fbLogin() {
+
+        // Check whether the user already logged in
+        FB.getLoginStatus(function (response) {
+            if (response.status === 'connected') {
+                console.log(response);
+                console.log("userId:" + response.authResponse.profile);
+                goToLoginFb(response.authResponse.accessToken);
+            } else {
+                FB.login(function (response) {
+                    if (response.authResponse) {
+                        
+                        goToLoginFb(response.authResponse.accessToken);
+                    }
+                }, { scope: 'email, public_profile' });
+            }
+        });
+    }
+    function goToLoginFb(accessToken) {
+
+        var returnUrl = getReturnUrl();
+        console.log("accessToken: " + accessToken);
+        var form = $('<form action="/Account/LoginByFacebook" method="POST">' +
+            '<input type="hidden" name="accessToken" value="' + accessToken + '" />' +
+            '<input type="hidden" name="returnUrl" value="' + returnUrl + '" />' +
+            '</form>');
+        //$('body').append(form);
+        //form.submit();
+    }
+    // Logout from facebook
+    function fbLogout() {
+        FB.logout();
+    }
+
+
+    function onSignIn(googleUser) {
+        GglogOut();
+       // console.log(googleUser.getBasicProfile());
+        var returnUrl = getReturnUrl();
+        var profile = googleUser.getBasicProfile();
+        var imageURL = profile.getImageUrl();
+        var name = profile.getName();
+        var email = profile.getEmail();
+        var ID = profile.getId();
+        var user =
+        {
+            ID: profile.getId(),
+            email: profile.getEmail(),
+            name: profile.getName(),
+            imageURL: profile.getImageUrl(),
+          //  auth_response: googleUser.getAuthResponse(),
+            id_token: googleUser.getAuthResponse().id_token,
+            access_token: googleUser.getAuthResponse().access_token,
+            expires_in: googleUser.getAuthResponse().expires_in
+        };
+        console.log(user);
+        var redirectUrl = '/Account/LoginByGoogle';
+        var form = $('<form action="' + redirectUrl + '" method="POST">' +
+            '<input type="text" name="id_token" value="' +
+            googleUser.getAuthResponse().id_token + '" />' +
+            '<input type="hidden" name="ID" value="' + ID + '" />' +
+            '<input type="hidden" name="fullname" value="' + name + '" />' +
+            '<input type="hidden" name="email" value="' + email + '" />' +
+            '<input type="hidden" name="avatar" value="' + imageURL + '" />' +
+            '<input type="hidden" name="returnUrl" value="' + returnUrl + '" />' +
+            '</form>');
+        //    var form2 = $('');
+      //  $('body').append(form);
+       // form.submit();
+    }
+
+    function GglogOut() {
+        gapi.auth2.getAuthInstance().signOut();
+    }
+
+    function getReturnUrl() {
+        var returnUrl = "";
+        var href = $(location).attr('href');
+        if (href.includes("Details")) {
+            var productId = $(".currentIDProduct").val();
+            returnUrl = "/Product/Details?productId=" + productId;
+        } else {
+            var kindId = $("#kindId").val();
+            var categoryId = $("#categoryId").val();
+            var maxPrice = $("#maxPrice").val();
+            var minPrice = $("#minPrice").val();
+            var productName = $("#productName").val();
+            var page = $("li.active.pager__item").children().text();
+           
+            returnUrl = "/Product/SearchProduct?kindId=" + kindId + "&categoryId=" + categoryId + "&maxPrice=" + maxPrice +
+                "&minPrice=" + minPrice + "&productName=" + productName + "&page=" + page;
+        }
+        return returnUrl;
+    }
+
+</script>
+
+<script src="~/assets/js/vendor/bootstrap-4.1.3.min.js"></script>
+<script src="~/assets/js/vendor/wow.min.js"></script>
+<script src="~/assets/js/vendor/owl-carousel.min.js"></script>
+<script src="~/assets/js/vendor/jquery.datetimepicker.full.min.js"></script>
+<script src="~/assets/js/main.js"></script>
+<script src="~/assets/js/vendor/jquery.nice-select.min.js"></script>

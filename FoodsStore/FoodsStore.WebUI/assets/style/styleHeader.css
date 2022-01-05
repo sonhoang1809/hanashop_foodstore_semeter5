@@ -1,0 +1,241 @@
+@import url('https://fonts.googleapis.com/css?family=Maven+Pro:500&display=swap');
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+header {
+    position: fixed;
+    max-width: 1450px;
+    width: 94%;
+    height: 80px;
+    margin: -280px 3%;
+    font-family: "Maven", monospace;
+    background: #ecf0f1;
+    box-sizing: border-box;
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, .2);
+    z-index: 1;
+}
+
+
+.logo {
+    cursor: pointer;
+    padding: 0 20px;
+    box-sizing: border-box;
+    float: left;
+}
+
+.logo img {
+    max-width: 270px;
+    max-height: 210px;
+}
+
+nav {
+    float: right;
+    padding-top: 0px;
+    margin-left: 800px;
+    margin-top: -75px;
+}
+
+
+.clearfix {
+    clear: both;
+}
+
+nav ul {
+    margin: 0;
+    padding: 0;
+    display: flex;
+}
+
+nav ul li {
+    list-style: none;
+}
+
+
+nav ul li a {
+    display: block;
+    width: auto;
+    height: 40px;
+    margin: 10px 20px;
+    padding: 10px 15px;
+    text-decoration: none;
+    color: #6E6D69;
+}
+nav ul li a.active i{
+    margin: auto;
+}
+
+nav ul li a.active,
+nav ul li a:hover {
+    background: linear-gradient(70deg, #0fbcf9, #8e44ad);
+    color: #fff;
+    transition: 0.5s;
+}
+
+.nav_links li a {
+    transition: all 0.5s ease 0s;
+}
+
+.nav_links li a:hover {
+    color: #fff;
+}
+
+.btnLogin {
+    margin-left: 210px;
+}
+
+.welcomeUser{
+    display: block;
+    margin-left: 90px;
+    margin-top: 10px;
+    width: 190px;
+    text-align: center;
+}
+
+.drop-downWelcomUser ul{
+    padding: 0;
+    list-style: none;
+    display: block;
+}
+.drop-downWelcomUser ul li{
+    padding: 0;
+    margin: 0;
+    float: right;
+    width: 230px;
+    text-align: right;
+    height: auto;
+    opacity: 0.8;
+    line-height: 20px;
+    display: none;
+    cursor: pointer;
+}
+.drop-downWelcomUser ul li a{
+    background: #ecf0f1;
+}
+.drop-downWelcomUser:hover{
+    display: block;
+    height: 65px;
+}
+
+.drop-downWelcomUser:hover ul li{
+    display: table;
+}
+
+.shopping-cart {
+    font-size: 22px;
+}
+.shopping-cart i{
+    margin: auto;
+}
+
+
+
+@media (max-width: 1350px) {
+    header{
+        width: 95%;
+        height: auto;
+    }
+    nav{
+        margin-top: 1px;
+    }
+
+    .menu-toggle {
+        display: block;
+        width: 40px;
+        height: 40px;
+        margin: 20px;
+        float: right;
+        cursor: pointer;
+        text-align: center;
+        font-size: 30px;
+        color: #7d77ff;
+    }
+
+    .menu-toggle:before {
+        content: '\f0c9';
+        font-family: fontAwesome;
+        line-height: 40px;
+    }
+
+    .menu-toggle.active:before {
+        content: '\f00d';
+    }
+
+    ul .nav_links {
+        display: none;
+    }
+
+    ul .nav_links.active {
+        display: block;
+        width: 100%;
+    }
+
+    ul .nav_links.active ul {
+        display: block;
+    }
+
+    ul .nav_links.active ul li a {
+        margin: 0;
+    }
+    
+    .welcomeUser{
+        height: 40px;
+        padding: 10px 15px;
+        width: auto;
+        text-align:left;
+    }
+    .drop-downWelcomUser ul li{
+        width: auto;
+        
+    }
+}
+@media (max-width: 1000px){
+    header{
+        width: 95%;
+        margin: -280px 2.5%;
+    }
+}
+@media (max-width: 750px){
+    header{
+        width: 95%;
+        margin: -280px 2.5%;
+    }
+}
+@media (max-width: 550px){
+    header{
+        width: 86.5%;
+        margin: -280px 5%;
+    }
+}
+@media (max-width: 470px){
+    header{
+        width: 86.5%;
+        margin: -280px 5%;
+    }
+    .logo{
+        padding-top: 5px;
+    }
+    .logo img{
+        width: 200px;
+        height: 60px;
+    }
+}
+@media (max-width: 350px){
+    header{
+        width: 90%;
+    }
+    .logo{
+        padding-top: 0;
+        padding-left: 8px;
+    }
+    .menu-toggle{
+        margin: 5% auto;
+    }
+    .logo img{
+        width: 175px;
+        height: 60px;
+    }
+}

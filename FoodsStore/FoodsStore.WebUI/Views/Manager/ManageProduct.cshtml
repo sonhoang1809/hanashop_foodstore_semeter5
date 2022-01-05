@@ -1,0 +1,156 @@
+﻿@{ 
+    Layout = "~/Views/Shared/_ManagerLayout.cshtml";
+    ViewBag.Title = "Manage Food";
+    int count = 0;
+}
+
+
+
+
+<div class="" id="home">
+   @Html.Partial("~/Views/Manager/_NavbarPartialView.cshtml")
+    <div class="container">
+        <div class="container mt-5">
+            <div class="row tm-content-row">
+                <div class="col-12 tm-block-col">
+                    <div class="tm-bg-primary-dark tm-block tm-block-h-auto">
+                        <h4 class="tm-block-title">List Kind</h4>
+                        <div class="col-lg-8 offset-lg-2">
+
+                            @*<form action="ManageProduct">*@
+                            @using (Html.BeginForm("ManageProduct", "Manager", FormMethod.Get)) {
+                                <select class="custom-select" name="kindId" onchange="this.form.submit();">
+                                    @foreach (var item in (IEnumerable<FoodsStore.Domain.Entities.Kind>)ViewData["KINDS"]) { //"KINDS" lấy từ ManagerController/ManageProduct Action Method
+                                        string active = "";
+                                        if (ViewBag.SelectedKind == item.KindID) {
+                                            active = "selected";
+                                        }
+
+                                        <option @active value="@item.KindID">@item.KindOfProduct</option>
+                                    }
+                                </select>
+                            }
+
+
+                            @*</form>*@
+
+
+                            <div style="height: 50px;"></div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="row tm-content-row">
+                <div class="col-sm-12 col-md-12 col-lg-8 col-xl-8 tm-block-col">
+                    <div class="tm-bg-primary-dark tm-block tm-block-products">
+                        <h4 class="tm-block-title">Product List</h4>
+                        <div class="tm-product-table-container">
+                            <table class="table table-hover tm-table-small tm-product-table">
+                                <thead style="border-top: 1px solid #333;position: sticky;top: 0;background-color: red;"> @*I want to fixed thead but I failed*@
+                                    <tr>
+                                        <th scope="col">STT</th>
+                                        <th scope="col">Food Name</th>
+                                        <th scope="col">Status</th>
+                                        <th scope="col">Price</th>
+                                        <th scope="col">Quantity</th>
+                                        <th scope="col">Create date</th>
+                                        <th scope="col">Update date</th>
+                                        <th scope="col">Update User</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+
+                                    @foreach (var item in (IEnumerable<FoodsStore.Domain.Entities.Product>)ViewData["PRODUCTS"]) {
+                                        <tr style="cursor: pointer;" onclick="document.getElementById('@item.ProductID' + 'forSubmit').submit();">
+                                            <td>@(++count)</td>
+                                            <td>@item.ProductName</td>
+                                            <td>
+
+
+                                                <div class="tm-status-circle moving">
+                                                </div> @Html.Action("GetProductStatusName", "Product", new { productId = item.ProductID})
+
+
+                                            </td>
+                                            <td>@item.Price.ToString("c")</td>
+                                            <td>@item.Quantity</td>
+                                            <td>@item.DateCreated.ToShortDateString()</td>
+                                            <td>@item.DateModified</td>
+                                            <td>@item.UserModified</td>
+                                            <td style="display: none;">
+                                                @*<form style="display: none;" action="EditProduct" method="GET" id="@item.CategoryID">
+                                                    <input type="hidden" name="productId" value="@item.ProductID">
+                                                    <input type="hidden" name="returnUrl" value="@Request.Url.PathAndQuery">
+                                                </form>*@
+
+                                                @using (Html.BeginForm("EditProduct", "Manager", FormMethod.Get, new { id = item.ProductID + "forSubmit" })) {
+                                                    <input type="hidden" name="productId" value="@item.ProductID">
+                                                    <input type="hidden" name="returnUrl" value="@Request.Url.PathAndQuery">
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- table container -->
+                        <div class="col-12">
+                            <form action="add-food.jsp" method="POST">
+                                <input type="hidden" name="kindIDAd" value="">
+                                <input type="hidden" name="categoryIDAd" value="">
+                                <button type="submit" style="font-size: 20px;" class="genric-btn warning btn btn-block text-uppercase">Add Product Now</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-12 col-md-12 col-lg-4 col-xl-4 tm-block-col">
+                    <div class="tm-bg-primary-dark tm-block tm-block-product-categories">
+                        <h4 class="tm-block-title">Product Categories</h4>
+                        <div class="tm-product-table-container">
+                            <table class="table table-hover tm-table-small tm-product-table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">STT</th>
+                                        <th scope="col">CATEGORY NAME</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @{ count = 0; }
+                                    @foreach (var item in (IEnumerable<FoodsStore.Domain.Entities.Category>)ViewData["CATEGORIES"]) {
+                                        string active = "";
+                                        if(ViewBag.SelectedCategory == item.CategoryID) {
+                                            active = "background-color:#6ca7d4;";
+                                        }
+                                            <tr style="cursor: pointer;@active" onclick="document.getElementById('@item.CategoryID' + 'forSubmit').submit();">
+                                                
+                                                <td>@(++count)</td>
+                                                <td>
+                                                    @item.CategoryName (@Html.Action("NumberOfProduct", "Manager", new { categoryId = item.CategoryID }))
+                                                </td>
+                                                <td style="display: none;">
+                                                    @*<form style="display: none;" action="ManageProduct" method="GET" id="@item.CategoryName">
+                                                        <input type="hidden" name="categoryId" value="@item.CategoryID">
+                                                       <input type="hidden" name="kindIDAd" value="">
+                                                    </form>*@
+
+                                                    @using (Html.BeginForm("ManageProduct", "Manager", FormMethod.Get, new { id = @item.CategoryID + "forSubmit", style = "display: none;" })) {
+                                                        <input type="hidden" name="categoryId" value="@item.CategoryID">
+                                                    }
+                                                </td>
+                                            </tr>
+                                            }
+
+
+                                        </tbody>
+                            </table>
+                        </div>
+                        <!-- table container -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

@@ -1,0 +1,101 @@
+﻿@model FoodsStore.WebUI.Models.ProductListViewModel
+
+@{ 
+    float? minPriceSearch = null;
+    float? maxPriceSearch = null;
+    string productNameSearch = null;
+    if (Model.SearchInfo != null) {
+        minPriceSearch = Model.SearchInfo.MinPrice;
+        maxPriceSearch = Model.SearchInfo.MaxPrice;
+        productNameSearch = Model.SearchInfo.ProductName;
+    }
+}
+<!--css for searchComponent-->
+<link rel="stylesheet" href="~/assets/style/style-search.css" type="text/css">
+<link rel="stylesheet" href="~/assets/css/nice-select.css" type="text/css">
+
+<!-- Filter Search Section Begin -->
+
+<div class="filter-search">
+    <div class="container"> 
+        <div class="row">
+            <div class="col-lg-12">
+                @using (Html.BeginForm("SearchProduct", "Product", FormMethod.Get, new { @class = "filter-form" })) {
+                    <div class="search-type">
+                        <p>Kind of Food</p>
+                        <select class="filter-property" id="kindId" name="kindId" onchange="_getCategoryWithSelectTag(this);">
+                            <option value="">Choose one</option>
+                            @foreach (var item in Model.Kinds) {
+                                string active = "";
+                                if(Model.SearchInfo != null) {
+                                    if(Model.SearchInfo.KindID == item.KindID) {
+                                        active = "selected";
+                                    }
+                                }
+                                <option @active value="@item.KindID">
+                                    @item.KindOfProduct
+                                </option>
+                            }
+                        </select>
+                    </div>
+                    <div class="search-type">
+                        <p>Category</p>
+                        <select class="filter-property" name="categoryId" id="categoryId">
+                            <option value="">Choose one</option>
+                            @if (Model.Categories != null) {
+                                foreach (var item in Model.Categories) {
+                                    string active = "";
+                                    if (Model.SearchInfo != null) {
+                                        if (Model.SearchInfo.CategoryID == item.CategoryID) {
+                                            active = "selected";
+                                        }
+                                    }
+                                    <option @active value="@item.CategoryID">@item.CategoryName</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="price-range">
+                        <p>Price Lower Than</p>                       
+                        $  <input type="number" class="btn btn-group" id="maxPrice" name="maxPrice" size="9" step="0.5" min='10' max="100" placeholder="Lower " value="@maxPriceSearch"
+                                style="width: 90%;" />
+                    </div>
+                    <div class="price-range">
+                        <p>Price Higher Than</p>
+                        $  <input type="number" class="btn btn-group" id="minPrice" name="minPrice" size="9" step="0.5" min='1' max="10" placeholder="Higher " value="@minPriceSearch"
+                                style="width: 90%;" />
+                    </div>
+                    <div class="search-name">
+                        <p>What do you looking for?</p>
+                        <div>
+                            <input type="text" id="productName" name="productName" value="@productNameSearch" class="btn btn-group" placeholder="">
+                        </div>
+                    </div>
+                    <input type="submit" onclick=" event.preventDefault(); searchProduct(1); scrollPage();" class="genric-btn success" id="search-btn" value="Search">
+                }
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Filter Search Section End -->
+<script>
+    function searchWhenInputProdname() {
+         window.setTimeout(function () {
+            searchProduct(1);
+        }, 600);
+    }
+
+    function onchangeKind(obj) {
+        if ($('#categoryId').val() == "") {
+            _getCategoryWithSelectTag(obj);
+            searchProduct(1);
+        } else {
+            _getCategoryWithSelectTag(obj);
+            window.setTimeout(function () {
+                searchProduct(1);
+            }, 1200);
+        }        
+    }
+</script>
+<script src="~/assets/js/vendor/jquery.nice-select.min.js"></script>
+<script type="text/javascript" src="~/Scripts/using-my-ajax.js"></script>
